@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+**/node_modules/
+
+# env
+.env
+**/.env
+
+# build output
+client/dist/
+dist/
+
+# uploads (keep the folder, ignore contents)
+server/uploads/*
+!server/uploads/.gitkeep
+
+# logs / misc
+*.log
+.DS_Store

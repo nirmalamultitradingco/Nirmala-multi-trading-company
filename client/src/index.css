@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-paper text-ink font-sans antialiased;
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+@layer components {
+  .container-x {
+    @apply mx-auto w-full max-w-content px-5 sm:px-8;
+  }
+
+  /* Monospaced trade-label eyebrow — the site's signature device.
+     Evokes shipping manifests / HS codes on every card and section. */
+  .eyebrow {
+    @apply font-mono text-[11px] uppercase tracking-[0.18em] text-moss;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5
+           text-sm font-medium transition focus:outline-none focus-visible:ring-2
+           focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-paper;
+  }
+  .btn-primary {
+    @apply btn bg-forest text-paper hover:bg-ink;
+  }
+  .btn-gold {
+    @apply btn bg-gold text-ink hover:brightness-105;
+  }
+  .btn-outline {
+    @apply btn border border-forest/25 text-forest hover:bg-forest hover:text-paper;
+  }
+
+  .field {
+    @apply w-full rounded-lg border border-line bg-white px-3.5 py-2.5 text-sm
+           text-ink placeholder:text-ink/40 focus:border-forest focus:outline-none
+           focus:ring-2 focus:ring-forest/15;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-ink/80;
+  }
+
+  .tag {
+    @apply inline-flex items-center rounded-full border border-line bg-white px-2.5 py-1
+           font-mono text-[11px] uppercase tracking-wide text-ink/70;
+  }
+}
