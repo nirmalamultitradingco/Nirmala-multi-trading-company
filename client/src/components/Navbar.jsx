@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { BRAND } from '../config.js';
+import NirmalaLogo from './NirmalaLogo.jsx';
 
 const nav = [
   { to: '/segments', label: 'Segments' },
@@ -14,12 +15,17 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line/70 bg-paper/85 backdrop-blur">
+    <header className="sticky p-4 top-0 z-40 border-b border-line/70 bg-paper/85 backdrop-blur">
       <div className="container-x flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-forest">
+          {/* <span className="grid h-8 w-8 place-items-center rounded-lg bg-forest">
             <span className="block h-3.5 w-3.5 rounded-full bg-gold" />
-          </span>
+          </span> */}
+          <img
+  src="/NMC logo.png"
+  alt="Nirmala Multi Trading Company"
+  className="h-16 w-auto object-contain"
+/>
           <span className="font-display text-lg font-extrabold tracking-tight text-ink">
             {BRAND.name}
           </span>

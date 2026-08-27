@@ -5,7 +5,11 @@ import Footer from './Footer.jsx';
 
 export default function Layout() {
   const { pathname } = useLocation();
-  useEffect(() => window.scrollTo(0, 0), [pathname]);
+  // useEffect(() => window.scrollTo(0, 0), [pathname]);
+
+  useEffect(() => {
+  window.scrollTo(0, 0);
+}, [pathname]);
 
   return (
     <div className="flex min-h-screen flex-col">

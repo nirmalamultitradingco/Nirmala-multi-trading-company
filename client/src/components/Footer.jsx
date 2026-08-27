@@ -7,9 +7,15 @@ export default function Footer() {
       <div className="container-x grid gap-10 py-14 md:grid-cols-4">
         <div className="md:col-span-2">
           <div className="flex items-center gap-2.5">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-forest">
+            {/* <span className="grid h-8 w-8 place-items-center rounded-lg bg-forest">
               <span className="block h-3.5 w-3.5 rounded-full bg-gold" />
-            </span>
+            </span> */}
+             <img
+    src="/NMC logo.png"
+    alt="Nirmala Multitrading Co."
+    className="h-12 w-auto object-contain"
+  />
+
             <span className="font-display text-lg font-extrabold text-paper">{BRAND.name}</span>
           </div>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-paper/65">{BRAND.blurb}</p>
