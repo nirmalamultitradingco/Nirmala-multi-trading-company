@@ -1,184 +1,3 @@
-// import { useEffect, useState } from 'react';
-// import { Link } from 'react-router-dom';
-// import api from '../api/axios.js';
-// import { BRAND } from '../config.js';
-// import SectionHeading from '../components/SectionHeading.jsx';
-// import ProductCard from '../components/ProductCard.jsx';
-// import SegmentCard from '../components/SegmentCard.jsx';
-// import PartnerCard from '../components/PartnerCard.jsx';
-// import Loader from '../components/Loader.jsx';
-
-// const pillars = [
-//   {
-//     n: '01',
-//     title: 'We source & vet',
-//     body: 'We partner directly with growers and processors, verify certifications, and inspect quality before anything is listed.',
-//   },
-//   {
-//     n: '02',
-//     title: 'We ready for export',
-//     body: 'Grading, packing, documentation and HS classification handled so shipments clear customs without friction.',
-//   },
-//   {
-//     n: '03',
-//     title: 'We deliver to buyers',
-//     body: 'One point of contact for pricing, samples and logistics across multiple product segments and origins.',
-//   },
-// ];
-
-// export default function Home() {
-//   const [data, setData] = useState({ segments: [], featured: [], partners: [] });
-//   const [loading, setLoading] = useState(true);
-
-//   useEffect(() => {
-//     Promise.all([
-//       api.get('/segments'),
-//       api.get('/products', { params: { featured: 'true', limit: 6 } }),
-//       api.get('/partners'),
-//     ])
-//       .then(([seg, prod, part]) =>
-//         setData({
-//           segments: seg.data.slice(0, 4),
-//           featured: prod.data.products,
-//           partners: part.data.slice(0, 6),
-//         })
-//       )
-//       .finally(() => setLoading(false));
-//   }, []);
-
-//   return (
-//     <div>
-//       {/* Hero */}
-//       <section className="border-b border-line">
-//         <div className="container-x grid items-center gap-10 py-16 md:grid-cols-[1.1fr_0.9fr] md:py-24">
-//           <div>
-//             <p className="eyebrow">{BRAND.tagline}</p>
-//             <h1 className="mt-4 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-5xl lg:text-6xl">
-//               Export-ready food,
-//               <br />
-//               <span className="text-forest">from source to shelf.</span>
-//             </h1>
-//             <p className="mt-5 max-w-lg text-lg leading-relaxed text-ink/65">{BRAND.blurb}</p>
-//             <div className="mt-8 flex flex-wrap gap-3">
-//               <Link to="/products" className="btn-primary">Browse products</Link>
-//               <Link to="/inquiry" className="btn-outline">Request a quote</Link>
-//             </div>
-//             <dl className="mt-10 grid grid-cols-3 gap-6 border-t border-line pt-6">
-//               {[
-//                 ['Segments', data.segments.length || '—'],
-//                 ['Partners', data.partners.length || '—'],
-//                 ['Certified', 'ISO · FSSAI'],
-//               ].map(([k, v]) => (
-//                 <div key={k}>
-//                   <dd className="font-display text-2xl font-extrabold text-ink">{v}</dd>
-//                   <dt className="font-mono text-[11px] uppercase tracking-widest text-ink/50">{k}</dt>
-//                 </div>
-//               ))}
-//             </dl>
-//           </div>
-
-//           <div className="relative">
-//             <div className="overflow-hidden rounded-2xl border border-line shadow-card">
-//               <img
-//                 src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1000&q=70"
-//                 alt="Assorted export food products"
-//                 className="aspect-[4/5] w-full object-cover"
-//               />
-//             </div>
-//             <div className="absolute -bottom-4 -left-4 hidden rounded-xl border border-line bg-paper px-4 py-3 shadow-card sm:block">
-//               <p className="font-mono text-[11px] uppercase tracking-widest text-moss">Ships from</p>
-//               <p className="font-display font-bold text-ink">{BRAND.address}</p>
-//             </div>
-//           </div>
-//         </div>
-//       </section>
-
-//       {/* How we work */}
-//       <section className="container-x py-16 md:py-20">
-//         <SectionHeading eyebrow="How we work" title="A single bridge to global buyers">
-//           Three steps that turn a grower's harvest into a compliant, on-time export shipment.
-//         </SectionHeading>
-//         <div className="mt-10 grid gap-5 md:grid-cols-3">
-//           {pillars.map((p) => (
-//             <div key={p.n} className="rounded-xl border border-line bg-white p-6 shadow-card">
-//               <span className="font-mono text-sm font-medium text-gold">{p.n}</span>
-//               <h3 className="mt-3 font-display text-xl font-bold text-ink">{p.title}</h3>
-//               <p className="mt-2 text-sm leading-relaxed text-ink/65">{p.body}</p>
-//             </div>
-//           ))}
-//         </div>
-//       </section>
-
-//       {loading ? (
-//         <Loader />
-//       ) : (
-//         <>
-//           {/* Featured products */}
-//           {data.featured.length > 0 && (
-//             <section className="container-x py-6 md:py-10">
-//               <div className="flex items-end justify-between gap-4">
-//                 <SectionHeading eyebrow="The next shipment" title="Featured products" />
-//                 <Link to="/products" className="hidden shrink-0 text-sm font-medium text-forest hover:underline sm:block">
-//                   View all →
-//                 </Link>
-//               </div>
-//               <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-//                 {data.featured.map((p) => (
-//                   <ProductCard key={p._id} product={p} />
-//                 ))}
-//               </div>
-//             </section>
-//           )}
-
-//           {/* Segments */}
-//           {data.segments.length > 0 && (
-//             <section className="container-x py-16 md:py-20">
-//               <div className="flex items-end justify-between gap-4">
-//                 <SectionHeading eyebrow="Product segments" title="Explore by category" />
-//                 <Link to="/segments" className="hidden shrink-0 text-sm font-medium text-forest hover:underline sm:block">
-//                   All segments →
-//                 </Link>
-//               </div>
-//               <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-//                 {data.segments.map((s) => (
-//                   <SegmentCard key={s._id} segment={s} />
-//                 ))}
-//               </div>
-//             </section>
-//           )}
-
-//           {/* Partners */}
-//           {data.partners.length > 0 && (
-//             <section className="border-y border-line bg-white/60">
-//               <div className="container-x py-16 md:py-20">
-//                 <SectionHeading eyebrow="Collaborations" title="Companies we work with" align="center">
-//                   We list and represent products from trusted growers and food companies.
-//                 </SectionHeading>
-//                 <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-//                   {data.partners.map((p) => (
-//                     <PartnerCard key={p._id} partner={p} />
-//                   ))}
-//                 </div>
-//               </div>
-//             </section>
-//           )}
-//         </>
-//       )}
-
-//       {/* CTA */}
-//       <section className="container-x py-16 md:py-24">
-//         <div className="overflow-hidden rounded-2xl bg-forest px-8 py-14 text-center text-paper md:px-16">
-//           <p className="eyebrow text-gold">Ready to talk?</p>
-//           <h2 className="mx-auto mt-3 max-w-2xl font-display text-3xl font-extrabold tracking-tight sm:text-4xl">
-//             Tell us what you're buying — we'll send samples and pricing.
-//           </h2>
-//           <Link to="/inquiry" className="btn-gold mt-8">Send an inquiry</Link>
-//         </div>
-//       </section>
-//     </div>
-//   );
-// }
-
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -192,29 +11,17 @@ import SegmentCard from '../components/SegmentCard.jsx';
 import PartnerCard from '../components/PartnerCard.jsx';
 import Loader from '../components/Loader.jsx';
 
-const pillars = [
-  {
-    n: '01',
-    title: 'We source & vet',
-    body: 'We partner directly with growers and processors, verify certifications, and inspect quality before anything is listed.',
-  },
-  {
-    n: '02',
-    title: 'We ready for export',
-    body: 'Grading, packing, documentation and HS classification handled so shipments clear customs without friction.',
-  },
-  {
-    n: '03',
-    title: 'We deliver to buyers',
-    body: 'One point of contact for pricing, samples and logistics across multiple product segments and origins.',
-  },
-];
+import HeroSlider from '../components/HeroSlider.jsx';
+import FeaturedProductsSlider from '../components/FeaturedProductsSlider.jsx';
+import GlobalServedMap from '../components/GlobalServedMap.jsx';
+import CertificateSlider from '../components/CertificateSlider.jsx';
 
 export default function Home() {
   const [data, setData] = useState({
     segments: [],
     featured: [],
     partners: [],
+    homeOfferings: null,
   });
 
   const [loading, setLoading] = useState(true);
@@ -224,15 +31,18 @@ export default function Home() {
 
     const loadHomeData = async () => {
       try {
-        const [seg, prod, part] = await Promise.all([
+        const [seg, prod, part, content] = await Promise.all([
           api.get('/segments'),
+
           api.get('/products', {
             params: {
               featured: 'true',
-              limit: 6,
+              limit: 12,
             },
           }),
+
           api.get('/partners'),
+          api.get('/site-content'),
         ]);
 
         if (!mounted) return;
@@ -248,12 +58,15 @@ export default function Home() {
         const partners = Array.isArray(part?.data)
           ? part.data.slice(0, 6)
           : [];
+        const homeOfferings = content?.data?.homeOfferings || null;
 
         setData({
           segments,
           featured,
           partners,
+          homeOfferings,
         });
+
       } catch (error) {
         console.error('Home page API error:', error);
 
@@ -263,7 +76,9 @@ export default function Home() {
           segments: [],
           featured: [],
           partners: [],
+          homeOfferings: null,
         });
+
       } finally {
         if (mounted) {
           setLoading(false);
@@ -278,233 +93,347 @@ export default function Home() {
     };
   }, []);
 
+  useEffect(() => {
+    const nodes = document.querySelectorAll('.home-reveal, .home-reveal-item');
+    if (!nodes.length) return undefined;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.16, rootMargin: '0px 0px -8% 0px' });
+
+    nodes.forEach((node) => observer.observe(node));
+    return () => observer.disconnect();
+  }, [loading, data.featured.length, data.segments.length, data.partners.length, data.homeOfferings]);
+
   return (
     <div>
-      {/* Hero */}
-      <section className="border-b border-line">
-        <div className="container-x grid items-center gap-10 py-16 md:grid-cols-[1.1fr_0.9fr] md:py-24">
-          <div>
-            <p className="eyebrow">
-              {BRAND.tagline}
-            </p>
 
-            <h1 className="mt-4 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-5xl lg:text-6xl">
-              Export-ready food,
-              <br />
-              <span className="text-forest">
-                from source to shelf.
-              </span>
-            </h1>
+      {/* =====================================================
+          HERO
+          ===================================================== */}
+      <HeroSlider />
 
-            <p className="mt-5 max-w-lg text-lg leading-relaxed text-ink/65">
-              {BRAND.blurb}
-            </p>
+      {/* =====================================================
+          API CONTENT
+          ===================================================== */}
 
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                to="/products"
-                className="btn-primary"
-              >
-                Browse products
-              </Link>
-
-              <Link
-                to="/inquiry"
-                className="btn-outline"
-              >
-                Request a quote
-              </Link>
-            </div>
-
-            <dl className="mt-10 grid grid-cols-3 gap-6 border-t border-line pt-6">
-              {[
-                [
-                  'Segments',
-                  data.segments?.length || '—',
-                ],
-                [
-                  'Partners',
-                  data.partners?.length || '—',
-                ],
-                [
-                  'Certified',
-                  'ISO · FSSAI',
-                ],
-              ].map(([key, value]) => (
-                <div key={key}>
-                  <dd className="font-display text-2xl font-extrabold text-ink">
-                    {value}
-                  </dd>
-
-                  <dt className="font-mono text-[11px] uppercase tracking-widest text-ink/50">
-                    {key}
-                  </dt>
-                </div>
-              ))}
-            </dl>
-          </div>
-
-          <div className="relative">
-            <div className="overflow-hidden rounded-2xl border border-line shadow-card">
-              <img
-                src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1000&q=70"
-                alt="Assorted export food products"
-                className="aspect-[4/5] w-full object-cover"
-              />
-            </div>
-
-            <div className="absolute -bottom-4 -left-4 hidden rounded-xl border border-line bg-paper px-4 py-3 shadow-card sm:block">
-              <p className="font-mono text-[11px] uppercase tracking-widest text-moss">
-                Ships from
-              </p>
-
-              <p className="font-display font-bold text-ink">
-                {BRAND.address}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How we work */}
-      <section className="container-x py-16 md:py-20">
-        <SectionHeading
-          eyebrow="How we work"
-          title="A single bridge to global buyers"
-        >
-          Three steps that turn a grower's harvest into a compliant,
-          on-time export shipment.
-        </SectionHeading>
-
-        <div className="mt-10 grid gap-5 md:grid-cols-3">
-          {pillars.map((pillar) => (
-            <div
-              key={pillar.n}
-              className="rounded-xl border border-line bg-white p-6 shadow-card"
-            >
-              <span className="font-mono text-sm font-medium text-gold">
-                {pillar.n}
-              </span>
-
-              <h3 className="mt-3 font-display text-xl font-bold text-ink">
-                {pillar.title}
-              </h3>
-
-              <p className="mt-2 text-sm leading-relaxed text-ink/65">
-                {pillar.body}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* API content */}
       {loading ? (
+
         <Loader />
+
       ) : (
+
         <>
-          {/* Featured products */}
-          {data.featured?.length > 0 && (
-            <section className="container-x py-6 md:py-10">
+
+          {/* =================================================
+              FEATURED PRODUCTS (AUTO-ROTATING CAROUSEL)
+              ================================================= */}
+
+          {data.featured.length > 0 && (
+
+            <section className="container-x py-6 md:py-10 home-reveal-section">
+
               <div className="flex items-end justify-between gap-4">
+
                 <SectionHeading
                   eyebrow="The next shipment"
-                  title="Featured products"
+                  title="Featured product details"
+                  className="home-reveal"
                 />
+
+                <Link
+                  to="/product-details"
+                  className="hidden shrink-0 text-sm font-medium text-forest hover:underline sm:block"
+                >
+                  All product details →
+                </Link>
+
+              </div>
+
+              <FeaturedProductsSlider products={data.featured} />
+
+            </section>
+
+          )}
+
+
+          {/* =================================================
+              PRODUCTS (CATEGORIES)
+              ================================================= */}
+
+          {data.segments.length > 0 && (
+
+            <section className="container-x py-16 md:py-20 home-reveal-section">
+
+              <div className="flex items-end justify-between gap-4">
+
+                <SectionHeading
+                  eyebrow="Products"
+                  title="Explore our products"
+                  className="home-reveal"
+                />
+
 
                 <Link
                   to="/products"
                   className="hidden shrink-0 text-sm font-medium text-forest hover:underline sm:block"
                 >
-                  View all →
+                  All products →
                 </Link>
+
               </div>
 
-              <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {data.featured.map((product) => (
-                  <ProductCard
-                    key={product._id}
-                    product={product}
-                  />
-                ))}
-              </div>
-            </section>
-          )}
 
-          {/* Segments */}
-          {data.segments?.length > 0 && (
-            <section className="container-x py-16 md:py-20">
-              <div className="flex items-end justify-between gap-4">
-                <SectionHeading
-                  eyebrow="Product segments"
-                  title="Explore by category"
-                />
+              <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
 
-                <Link
-                  to="/segments"
-                  className="hidden shrink-0 text-sm font-medium text-forest hover:underline sm:block"
-                >
-                  All segments →
-                </Link>
-              </div>
-
-              <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 {data.segments.map((segment) => (
+
+                  <div className="home-reveal-item">
                   <SegmentCard
                     key={segment._id}
                     segment={segment}
                   />
+                </div>
                 ))}
+
+              </div>
+
+            </section>
+
+          )}
+
+
+          {/* =================================================
+              WHAT WE OFFER
+              ================================================= */}
+
+          {data.homeOfferings?.items?.filter((item) => item.isActive !== false).length > 0 && (
+            <section className="border-y border-line bg-paper home-reveal-section">
+              <div className="container-x py-16 md:py-20">
+                <SectionHeading
+                  eyebrow={data.homeOfferings.eyebrow}
+                  title={data.homeOfferings.title}
+                  className="home-reveal"
+                  align="center"
+                >
+                  {data.homeOfferings.description}
+                </SectionHeading>
+
+                <div className="mt-10 grid gap-5 md:grid-cols-3">
+                  {data.homeOfferings.items
+                    .filter((item) => item.isActive !== false)
+                    .sort((a, b) => (a.order || 0) - (b.order || 0))
+                    .map((item, index) => (
+                      <article
+                        key={item._id || index}
+                        className="home-reveal-item cursor-pointer rounded-2xl border border-line bg-white p-6 shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+                      >
+                        <span className="font-mono text-sm font-semibold text-gold">
+                          {item.icon || String(index + 1).padStart(2, '0')}
+                        </span>
+                        <h3 className="mt-4 font-display text-xl font-bold text-ink">
+                          {item.title}
+                        </h3>
+                        <p className="mt-2 text-sm leading-relaxed text-ink/65">
+                          {item.description}
+                        </p>
+                      </article>
+                    ))}
+                </div>
               </div>
             </section>
           )}
 
-          {/* Partners */}
-          {data.partners?.length > 0 && (
-            <section className="border-y border-line bg-white/60">
+          {/* =================================================
+              MERCHANT FOOD EXPORTER LOGISTICS & PORT CAPABILITIES
+              ================================================= */}
+          <section className="border-b border-line bg-gradient-to-b from-[#fbf8f4] to-white home-reveal-section">
+            <div className="container-x py-16 md:py-24">
+              <div className="text-center max-w-3xl mx-auto home-reveal">
+                <span className="inline-flex items-center gap-2 rounded-full bg-forest/10 px-4 py-1.5 font-mono text-xs font-bold uppercase tracking-widest text-forest">
+                  <span>⚓</span> Global Merchant Food Exporter Capabilities
+                </span>
+                <h2 className="mt-3 font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-ink">
+                  Engineered for High-Volume International Trade
+                </h2>
+                <p className="mt-3 text-base text-ink/70 leading-relaxed">
+                  We bridge global importers, distributors, and supermarket chains with certified Indian farm clusters, handling end-to-end container logistics, customs clearance, and private labeling.
+                </p>
+              </div>
+
+              <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                {/* 1. Container Loading */}
+                <div className="home-reveal-item rounded-3xl border border-line/80 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-gold">
+                  <div className="flex items-center justify-between">
+                    <span className="grid h-12 w-12 place-items-center rounded-2xl bg-amber-50 text-2xl border border-amber-200">
+                      🚢
+                    </span>
+                    <span className="font-mono text-[11px] font-bold text-forest bg-forest/10 rounded-full px-2.5 py-0.5">
+                      FCL & LCL
+                    </span>
+                  </div>
+                  <h3 className="mt-5 font-display text-lg font-bold text-ink">Container Consolidation</h3>
+                  <p className="mt-2 text-xs text-ink/65 leading-relaxed">
+                    20ft GP (18-20 MT) and 40ft High Cube (26-28 MT) loadings. Multi-commodity consolidation in a single container for trial consignments.
+                  </p>
+                  <div className="mt-4 pt-4 border-t border-line/50 font-mono text-[11px] text-ink/50">
+                    Max payload · Palletized / Loose
+                  </div>
+                </div>
+
+                {/* 2. Direct Port Corridors */}
+                <div className="home-reveal-item rounded-3xl border border-line/80 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-gold">
+                  <div className="flex items-center justify-between">
+                    <span className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-50 text-2xl border border-blue-200">
+                      ⚓
+                    </span>
+                    <span className="font-mono text-[11px] font-bold text-blue-700 bg-blue-50 rounded-full px-2.5 py-0.5">
+                      INMUN1 & INNSA
+                    </span>
+                  </div>
+                  <h3 className="mt-5 font-display text-lg font-bold text-ink">Mundra & JNPT Ports</h3>
+                  <p className="mt-2 text-xs text-ink/65 leading-relaxed">
+                    Strategic ocean corridor stuffing directly at Mundra Port (Gujarat) and JNPT Nhava Sheva (Mumbai) with fast 48h vessel customs clearance.
+                  </p>
+                  <div className="mt-4 pt-4 border-t border-line/50 font-mono text-[11px] text-ink/50">
+                    FOB · CIF · CFR · Ex-Works
+                  </div>
+                </div>
+
+                {/* 3. Custom Private Labeling */}
+                <div className="home-reveal-item rounded-3xl border border-line/80 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-gold">
+                  <div className="flex items-center justify-between">
+                    <span className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-50 text-2xl border border-emerald-200">
+                      🏷️
+                    </span>
+                    <span className="font-mono text-[11px] font-bold text-emerald-700 bg-emerald-50 rounded-full px-2.5 py-0.5">
+                      OEM / ODM
+                    </span>
+                  </div>
+                  <h3 className="mt-5 font-display text-lg font-bold text-ink">Private Label Packaging</h3>
+                  <p className="mt-2 text-xs text-ink/65 leading-relaxed">
+                    Custom retail standup barrier pouches (100g to 1kg) with nitrogen flush, zipper locks, and master export cartons bearing your supermarket brand.
+                  </p>
+                  <div className="mt-4 pt-4 border-t border-line/50 font-mono text-[11px] text-ink/50">
+                    Retail Pouches · 25/50kg PP Bags
+                  </div>
+                </div>
+
+                {/* 4. Inspection & Compliance */}
+                <div className="home-reveal-item rounded-3xl border border-line/80 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-gold">
+                  <div className="flex items-center justify-between">
+                    <span className="grid h-12 w-12 place-items-center rounded-2xl bg-rose-50 text-2xl border border-rose-200">
+                      🔬
+                    </span>
+                    <span className="font-mono text-[11px] font-bold text-rose-700 bg-rose-50 rounded-full px-2.5 py-0.5">
+                      SGS / TUV
+                    </span>
+                  </div>
+                  <h3 className="mt-5 font-display text-lg font-bold text-ink">Audit-Ready Compliance</h3>
+                  <p className="mt-2 text-xs text-ink/65 leading-relaxed">
+                    Phytosanitary certification, Certificate of Origin (COO), Sortex laser cleaning, and comprehensive MRL pesticide residue lab clearance.
+                  </p>
+                  <div className="mt-4 pt-4 border-t border-line/50 font-mono text-[11px] text-ink/50">
+                    APEDA · Spices Board · US FDA
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* =================================================
+              PARTNERS
+              ================================================= */}
+
+          {data.partners.length > 0 && (
+
+            <section className="border-y border-line bg-white/60 home-reveal-section">
+
               <div className="container-x py-16 md:py-20">
+
                 <SectionHeading
                   eyebrow="Collaborations"
                   title="Companies we work with"
+                  className="home-reveal"
                   align="center"
                 >
                   We list and represent products from trusted growers
                   and food companies.
                 </SectionHeading>
 
+
                 <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+
                   {data.partners.map((partner) => (
+
+                    <div className="home-reveal-item">
                     <PartnerCard
                       key={partner._id}
                       partner={partner}
                     />
+                  </div>
                   ))}
+
                 </div>
+
               </div>
+
             </section>
+
           )}
+
         </>
+
       )}
 
-      {/* CTA */}
-      <section className="container-x py-16 md:py-24">
-        <div className="overflow-hidden rounded-2xl bg-forest px-8 py-14 text-center text-paper md:px-16">
+
+      {/* =====================================================
+          GLOBAL SERVED SEGMENTS MAP
+          ===================================================== */}
+      <GlobalServedMap />
+
+
+      {/* =====================================================
+          CERTIFICATES SLIDER
+          ===================================================== */}
+      <CertificateSlider />
+
+
+      {/* =====================================================
+          CTA
+          ===================================================== */}
+
+      <section className="container-x py-16 md:py-24 home-reveal-section">
+
+        <div className="home-reveal overflow-hidden rounded-2xl bg-forest px-8 py-14 text-center text-paper md:px-16">
+
           <p className="eyebrow text-gold">
             Ready to talk?
           </p>
+
 
           <h2 className="mx-auto mt-3 max-w-2xl font-display text-3xl font-extrabold tracking-tight sm:text-4xl">
             Tell us what you're buying — we'll send samples and pricing.
           </h2>
 
+
           <Link
             to="/inquiry"
-            className="btn-gold mt-8"
+            className="btn-gold mt-8 animated-cta"
           >
             Send an inquiry
           </Link>
+
         </div>
+
       </section>
+
+
     </div>
   );
 }

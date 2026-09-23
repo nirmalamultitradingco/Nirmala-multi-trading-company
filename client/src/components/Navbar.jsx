@@ -1,33 +1,60 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { BRAND } from '../config.js';
-import NirmalaLogo from './NirmalaLogo.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 const nav = [
-  { to: '/segments', label: 'Segments' },
+  { to: '/', label: 'Home' },
+  { to: '/about', label: 'About' },
   { to: '/products', label: 'Products' },
   { to: '/partners', label: 'Partners' },
   { to: '/brochures', label: 'Brochures' },
-  { to: '/about', label: 'About' },
+  { to: '/blog', label: 'Blog' },
+];
+
+const getNavLabel = (n, t) => {
+  switch (n.to) {
+    case '/':
+      return t('home') || 'Home';
+    case '/about':
+      return t('aboutUs') || 'About';
+    case '/products':
+      return t('products') || 'Products';
+    case '/product-details':
+      return t('productDetails') || 'Product Details';
+    case '/partners':
+      return t('partners') || 'Partners';
+    case '/brochures':
+      return t('brochures') || 'Brochures';
+    case '/blog':
+      return t('blog') || 'Blog';
+    default:
+      return n.label;
+  }
+};
+
+const languages = [
+  { code: 'en', label: 'English' },
+  { code: 'es', label: 'Español' },
+  { code: 'nl', label: 'Nederlands' },
+  { code: 'ar', label: 'UAE (العربية)' },
 ];
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const { language, setLanguage, t } = useLanguage();
 
   return (
-    <header className="sticky p-4 top-0 z-40 border-b border-line/70 bg-paper/85 backdrop-blur">
-      <div className="container-x flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
-          {/* <span className="grid h-8 w-8 place-items-center rounded-lg bg-forest">
-            <span className="block h-3.5 w-3.5 rounded-full bg-gold" />
-          </span> */}
+    <header className="sticky top-0 z-40 border-b border-line/70 bg-paper/85 p-4 backdrop-blur">
+      <div className="container-x flex h-16 items-center justify-between gap-5">
+        <Link to="/" className="flex shrink-0 items-center gap-2.5" onClick={() => setOpen(false)}>
           <img
-  src="/NMC logo.png"
-  alt="Nirmala Multi Trading Company"
-  className="h-16 w-auto object-contain"
-/>
-          <span className="font-display text-lg font-extrabold tracking-tight text-ink">
-            {BRAND.name}
+            src="/NMC logo.png"
+            alt={`${BRAND.name} — ${BRAND.tagline}`}
+            className="h-16 w-auto object-contain"
+          />
+          <span className="flex flex-col font-display leading-tight">
+            <strong className="text-lg font-extrabold tracking-tight text-ink">{BRAND.fullName}</strong>
           </span>
         </Link>
 
@@ -37,17 +64,33 @@ export default function Navbar() {
               key={n.to}
               to={n.to}
               className={({ isActive }) =>
-                `text-sm font-medium transition ${
-                  isActive ? 'text-forest' : 'text-ink/70 hover:text-ink'
+                `text-sm font-medium transition ${isActive ? 'text-forest' : 'text-ink/70 hover:text-ink'
                 }`
               }
             >
-              {n.label}
+              {getNavLabel(n, t)}
             </NavLink>
           ))}
-          <Link to="/inquiry" className="btn-primary">
-            Get a quote
+
+          <Link to="/inquiry" className="btn-primary header-quote-btn">
+            <span>{t('getQuote')}</span><span className="header-quote-btn__arrow" aria-hidden="true">↗</span>
           </Link>
+
+          <label className="relative flex items-center" aria-label={t('language')}>
+            <span className="mr-2 text-base" aria-hidden="true">🌐</span>
+            <select
+              value={language}
+              onChange={(event) => setLanguage(event.target.value)}
+              className="cursor-pointer appearance-none rounded-full border border-line bg-paper px-3 py-2 pr-8 text-sm font-medium text-ink outline-none transition hover:border-forest focus:border-forest focus:ring-2 focus:ring-forest/15"
+            >
+              {languages.map((item) => (
+                <option key={item.code} value={item.code}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+            <span className="pointer-events-none absolute right-3 text-xs text-ink/50" aria-hidden="true">⌄</span>
+          </label>
         </nav>
 
         <button
@@ -76,12 +119,30 @@ export default function Navbar() {
                   `py-2 text-sm font-medium ${isActive ? 'text-forest' : 'text-ink/75'}`
                 }
               >
-                {n.label}
+                {getNavLabel(n, t)}
               </NavLink>
             ))}
-            <Link to="/inquiry" className="btn-primary mt-3" onClick={() => setOpen(false)}>
-              Get a quote
+
+            <Link to="/inquiry" className="btn-primary mt-3 header-quote-btn" onClick={() => setOpen(false)}>
+              {t('getQuote')}
             </Link>
+
+            <label className="mt-3 flex items-center gap-2 border-t border-line pt-3 text-sm font-medium text-ink/80">
+              <span aria-hidden="true">🌐</span>
+              <span>{t('language')}</span>
+              <select
+                value={language}
+                onChange={(event) => setLanguage(event.target.value)}
+                className="ml-auto rounded-full border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-forest"
+                aria-label={t('language')}
+              >
+                {languages.map((item) => (
+                  <option key={item.code} value={item.code}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
         </nav>
       )}

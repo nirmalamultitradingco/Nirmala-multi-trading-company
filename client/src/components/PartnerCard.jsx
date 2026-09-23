@@ -2,7 +2,7 @@ import { asset } from '../api/axios.js';
 
 export default function PartnerCard({ partner }) {
   return (
-    <div className="flex flex-col rounded-xl border border-line bg-white p-5 shadow-card">
+    <div className="flex cursor-pointer flex-col rounded-xl border border-line bg-white p-5 shadow-card transition duration-300 hover:-translate-y-1">
       <div className="flex items-center gap-3">
         <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-lg bg-line">
           {partner.logo ? (

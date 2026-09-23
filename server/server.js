@@ -15,7 +15,6 @@
 // import inquiryRoutes from './src/routes/inquiryRoutes.js';
 // import brochureRoutes from './src/routes/brochureRoutes.js';
 // import uploadRoutes from './src/routes/uploadRoutes.js';
-
 // dotenv.config();
 // await connectDB();
 
@@ -63,17 +62,22 @@ import { notFound, errorHandler } from './src/middleware/error.js';
 
 import authRoutes from './src/routes/authRoutes.js';
 import segmentRoutes from './src/routes/segmentRoutes.js';
+import subSegmentRoutes from './src/routes/subSegmentRoutes.js';
 import partnerRoutes from './src/routes/partnerRoutes.js';
 import productRoutes from './src/routes/productRoutes.js';
 import inquiryRoutes from './src/routes/inquiryRoutes.js';
 import brochureRoutes from './src/routes/brochureRoutes.js';
 import uploadRoutes from './src/routes/uploadRoutes.js';
-
-dotenv.config();
+import siteContentRoutes from './src/routes/siteContentRoutes.js';
+import newsRoutes from './src/routes/newsRoutes.js';
+import subscriberRoutes from './src/routes/subscriberRoutes.js';
 
 const __dirname = path.dirname(
   fileURLToPath(import.meta.url)
 );
+
+dotenv.config({ path: path.join(__dirname, '.env') });
+dotenv.config();
 
 const app = express();
 
@@ -129,11 +133,15 @@ app.use('/api', async (req, res, next) => {
 /* API routes */
 app.use('/api/auth', authRoutes);
 app.use('/api/segments', segmentRoutes);
+app.use('/api/subsegments', subSegmentRoutes);
 app.use('/api/partners', partnerRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/inquiries', inquiryRoutes);
 app.use('/api/brochures', brochureRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/site-content', siteContentRoutes);
+app.use('/api/news', newsRoutes);
+app.use('/api/subscribers', subscriberRoutes);
 
 /* Errors */
 app.use(notFound);

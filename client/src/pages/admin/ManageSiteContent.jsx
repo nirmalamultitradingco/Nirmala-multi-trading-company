@@ -1,0 +1,1080 @@
+import { useEffect, useState } from 'react';
+import api, { asset } from '../../api/axios.js';
+import ImageUpload from '../../components/admin/ImageUpload.jsx';
+import VideoUpload from '../../components/admin/VideoUpload.jsx';
+
+const defaults = {
+  homeHero: { eyebrow: 'NMC', title: 'India’s Taste. The World’s Table', description: 'Connecting trusted Indian food products with buyers around the world.', items: [{ title: 'Quality Products', description: 'Sourcing quality products for global markets.', image: 'https://www.w3schools.com/w3images/coffee.jpg', order: 1, isActive: true }, { title: 'Trusted Trading Partner', description: 'Reliable sourcing, documentation and export solutions.', image: 'https://www.w3schools.com/w3images/workbench.jpg', order: 2, isActive: true }, { title: 'Global Connections', description: 'Connecting trusted suppliers with international buyers.', image: 'https://www.w3schools.com/w3images/sound.jpg', order: 3, isActive: true }] },
+  aboutHero: { eyebrow: 'About NMC', title: 'India’s Taste. The World’s Table', description: 'We connect trusted Indian food products with international buyers through a clear, organised export process.' },
+  inquiryHero: { eyebrow: 'Get in touch', title: "We're ready to talk.", description: 'Tell us what you are looking for and our export team will get back to you with product details, samples and pricing.' },
+  homeOfferings: { eyebrow: 'What we offer', title: 'Export support built around your market', description: '', items: [] },
+  homeHowWeWork: { eyebrow: 'How we work', title: 'A single bridge to global buyers', description: '', items: [] },
+  aboutApproach: { eyebrow: 'Our approach', title: 'What sets us apart', description: '', items: [] },
+  aboutWhyChooseUs: { eyebrow: 'Why choose us', title: 'A practical partner for international food sourcing', description: '', items: [] },
+  testimonials: { eyebrow: 'Client feedback', title: 'What our clients say about us', description: '', items: [] },
+  globalMap: {
+    eyebrow: 'Global Footprint',
+    title: 'Export Corridors We Actively Serve',
+    description: 'Reliable maritime & air freight routes delivering export-grade Indian agri commodities, spices, and processed foods worldwide.',
+    regions: [
+      { name: 'United States', code: 'USA', x: 230, y: 195, ports: ['New York / New Jersey', 'Long Beach (Los Angeles)', 'Houston / Savannah'], transitTime: '24 – 28 Days', deliveryRate: '99.4%', volumeGrowth: '+34%', order: 1, isActive: true },
+      { name: 'United Kingdom', code: 'UK', x: 472, y: 145, ports: ['Felixstowe', 'Southampton', 'London Gateway'], transitTime: '18 – 22 Days', deliveryRate: '99.8%', volumeGrowth: '+28%', order: 2, isActive: true },
+      { name: 'European Union', code: 'Europe', x: 510, y: 170, ports: ['Rotterdam (Netherlands)', 'Hamburg (Germany)', 'Antwerp (Belgium)'], transitTime: '20 – 24 Days', deliveryRate: '99.2%', volumeGrowth: '+41%', order: 3, isActive: true },
+      { name: 'Norway & Scandinavia', code: 'Norway', x: 520, y: 110, ports: ['Oslo Port', 'Gothenburg', 'Bergen'], transitTime: '22 – 26 Days', deliveryRate: '99.5%', volumeGrowth: '+19%', order: 4, isActive: true },
+      { name: 'GCC & Middle East', code: 'GCC', x: 615, y: 235, ports: ['Jebel Ali (Dubai)', 'Hamad Port (Qatar)', 'Jeddah Islamic Port (KSA)'], transitTime: '4 – 7 Days', deliveryRate: '99.9%', volumeGrowth: '+52%', order: 5, isActive: true },
+      { name: 'Asian Markets', code: 'Asian', x: 790, y: 280, ports: ['Port of Singapore', 'Port Klang (Malaysia)', 'Tokyo / Yokohama (Japan)'], transitTime: '8 – 14 Days', deliveryRate: '99.6%', volumeGrowth: '+37%', order: 6, isActive: true },
+    ],
+    pillars: [
+      { number: '01', title: '6 Global Corridors', text: 'Established logistics networks reaching USA, Europe, UK, Norway, Asia, and GCC ports.', order: 1, isActive: true },
+      { number: '02', title: '100% HS & Lab Clearance', text: 'Pre-shipment phytosanitary, pesticide MRL, and fumigation certificates for zero-delay customs clearance.', order: 2, isActive: true },
+      { number: '03', title: 'Direct Sea & Air Options', text: 'Full Container Load (FCL), Less than Container Load (LCL), and urgent temperature-controlled air freight.', order: 3, isActive: true },
+      { number: '04', title: 'Flexible Incoterms', text: 'FOB, CIF, CFR, and DDP terms customized to buyer preference with transparent tracking.', order: 4, isActive: true },
+    ],
+  },
+  certificates: {
+    eyebrow: 'Accreditations & Compliance',
+    title: 'Certified for Global Trade',
+    description: 'Our export consignments strictly conform to international food safety, phytosanitary standards, and destination-country import regulations.',
+    items: [
+      { name: 'Food Safety and Standards Authority of India', issuer: 'Govt. of India Statutory Food License', code: 'fssai', description: 'Mandatory central certification verifying supreme hygiene, raw material testing, pesticide residue adherence, and ethical food packaging standards.', highlights: ['Zero adulteration mandate', 'Periodic batch laboratory assays', 'Full farm-to-dispatch traceability'], order: 1, isActive: true },
+      { name: 'Agricultural & Processed Food Products Export Development Authority', issuer: 'Ministry of Commerce & Industry, India', code: 'apeda', description: 'Official export certification facilitating trade oversight, scheduled food grading, port-level phytosanitary documentation, and residue monitoring.', highlights: ['Global organic trace compliance', 'Govt accredited export verification', 'Scheduled agricultural standards'], order: 2, isActive: true },
+      { name: 'Good Manufacturing Practice', issuer: 'Quality & Integrity Assured Manufacturing', code: 'gmp', description: 'Ensures products are consistently manufactured and controlled to quality standards appropriate to their intended use and international market requirements.', highlights: ['State-of-the-art grading & packing', 'Standard operating procedures (SOP)', 'Batch consistency guarantees'], order: 3, isActive: true },
+      { name: 'Good Hygiene Practices', issuer: 'Sanitation & Clean Handling Protocol', code: 'ghp', description: 'Strict hygiene controls across raw material procurement, warehouse cleanliness, employee sanitation, and temperature-controlled storage.', highlights: ['Sanitized packing environments', 'Pest-free hermetic storage', 'Safe contact packaging'], order: 4, isActive: true },
+      { name: 'Hazard Analysis Critical Control Point', issuer: 'Preventive Food Safety Protocol', code: 'haccp', description: 'Systematic preventive approach targeting biological, chemical, and physical food hazards in production processes rather than finished product inspection alone.', highlights: ['Critical control point monitoring', 'Contamination prevention', 'Continuous process validation'], order: 5, isActive: true },
+      { name: 'ISO 22000:2018 Food Safety Management', issuer: 'International Organization for Standardization', code: 'iso22000', description: 'The premier global food safety management benchmark harmonizing interactive communication, system management, and prerequisite programs.', highlights: ['Comprehensive hazard screening', 'International supply-chain alignment', 'Rigorous third-party audits'], order: 6, isActive: true },
+      { name: 'American Spice Trade Association', issuer: 'Premier International Spice Trade Body', code: 'asta', description: 'Adherence to ASTA cleanliness specifications, steam sterilization standards, volatile oil content guarantees, and moisture thresholds for North American and world markets.', highlights: ['Cleanliness & purity testing', 'ETO / Steam treated options', 'Strict volatile oil benchmarks'], order: 7, isActive: true },
+    ],
+  },
+  flashCard: {
+    isActive: true,
+    title: 'India’s Taste. The World’s Table',
+    subtitle: 'Direct sourcing of export-grade Indian spices, premium grains, and agro-commodities with certified global shipping.',
+    image: '',
+    buttonText: 'Explore Our Products',
+    buttonLink: '/products',
+  },
+};
+
+const clone = (v) => JSON.parse(JSON.stringify(v));
+
+function ItemEditor({ section, setSection, image = false, side = false, video = false }) {
+  const updateItem = (i, key, value) => {
+    const items = [...(section?.items || [])];
+    items[i] = { ...items[i], [key]: value };
+    setSection({ ...section, items });
+  };
+  const add = () =>
+    setSection({
+      ...section,
+      items: [
+        ...(section?.items || []),
+        {
+          title: '',
+          description: '',
+          icon: String((section?.items?.length || 0) + 1).padStart(2, '0'),
+          order: (section?.items?.length || 0) + 1,
+          isActive: true,
+          image: '',
+          video: '',
+          side: 'left',
+        },
+      ],
+    });
+  const remove = (i) =>
+    setSection({
+      ...section,
+      items: (section?.items || []).filter((_, index) => index !== i),
+    });
+
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="label">Eyebrow / small label</label>
+          <input
+            className="field"
+            value={section?.eyebrow || ''}
+            onChange={(e) => setSection({ ...section, eyebrow: e.target.value })}
+          />
+        </div>
+        <div>
+          <label className="label">Main heading</label>
+          <input
+            className="field"
+            value={section?.title || ''}
+            onChange={(e) => setSection({ ...section, title: e.target.value })}
+          />
+        </div>
+      </div>
+      <div>
+        <label className="label">Description</label>
+        <textarea
+          className="field"
+          rows="3"
+          value={section?.description || ''}
+          onChange={(e) => setSection({ ...section, description: e.target.value })}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <h3 className="font-display font-bold">Items</h3>
+        <button type="button" className="btn-outline" onClick={add}>
+          + Add item
+        </button>
+      </div>
+      {(section?.items || []).map((item, i) => (
+        <div key={item._id || i} className="rounded-xl border border-line bg-paper p-4">
+          <div className="flex items-center justify-between">
+            <span className="font-mono text-xs uppercase tracking-widest text-moss">Item {i + 1}</span>
+            <button
+              type="button"
+              className="text-sm text-clay hover:underline"
+              onClick={() => remove(i)}
+            >
+              Remove
+            </button>
+          </div>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="label">Title</label>
+              <input
+                className="field"
+                value={item.title || ''}
+                onChange={(e) => updateItem(i, 'title', e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="label">Number / icon</label>
+              <input
+                className="field"
+                value={item.icon || ''}
+                onChange={(e) => updateItem(i, 'icon', e.target.value)}
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="label">Description</label>
+              <textarea
+                className="field"
+                rows="3"
+                value={item.description || ''}
+                onChange={(e) => updateItem(i, 'description', e.target.value)}
+              />
+            </div>
+            {image && (
+              <div className="sm:col-span-2">
+                <ImageUpload
+                  label="Poster / Fallback Image"
+                  value={item.image || ''}
+                  onChange={(url) => updateItem(i, 'image', url)}
+                />
+              </div>
+            )}
+            {video && (
+              <div className="sm:col-span-2">
+                <VideoUpload
+                  label="Product Commercial Video (MP4 / WebM / Direct URL)"
+                  value={item.video || ''}
+                  onChange={(url) => updateItem(i, 'video', url)}
+                />
+              </div>
+            )}
+            {side && (
+              <div>
+                <label className="label">Timeline side</label>
+                <select
+                  className="field"
+                  value={item.side || 'left'}
+                  onChange={(e) => updateItem(i, 'side', e.target.value)}
+                >
+                  <option value="left">Left</option>
+                  <option value="right">Right</option>
+                </select>
+              </div>
+            )}
+            <div className="w-28">
+              <label className="label">Order</label>
+              <input
+                type="number"
+                className="field"
+                value={item.order ?? i + 1}
+                onChange={(e) => updateItem(i, 'order', Number(e.target.value))}
+              />
+            </div>
+          </div>
+          <label className="mt-3 flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={item.isActive !== false}
+              onChange={(e) => updateItem(i, 'isActive', e.target.checked)}
+            />{' '}
+            Visible on site
+          </label>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MapEditor({ section, setSection }) {
+  const current = section || defaults.globalMap;
+  const updateRegion = (i, key, value) => {
+    const regions = [...(current.regions || [])];
+    regions[i] = { ...regions[i], [key]: value };
+    setSection({ ...current, regions });
+  };
+
+  const addRegion = () => {
+    setSection({
+      ...current,
+      regions: [
+        ...(current.regions || []),
+        {
+          name: 'New Destination',
+          code: 'NEW',
+          x: 500,
+          y: 250,
+          transitTime: '15 – 20 Days',
+          ports: ['Primary Port A', 'Primary Port B'],
+          deliveryRate: '99.5%',
+          volumeGrowth: '+25%',
+          order: (current.regions?.length || 0) + 1,
+          isActive: true,
+        },
+      ],
+    });
+  };
+
+  const removeRegion = (i) => {
+    setSection({
+      ...current,
+      regions: (current.regions || []).filter((_, index) => index !== i),
+    });
+  };
+
+  const updatePillar = (i, key, value) => {
+    const pillars = [...(current.pillars || defaults.globalMap.pillars)];
+    pillars[i] = { ...pillars[i], [key]: value };
+    setSection({ ...current, pillars });
+  };
+
+  const addPillar = () => {
+    const currentPillars = current.pillars || defaults.globalMap.pillars;
+    setSection({
+      ...current,
+      pillars: [
+        ...currentPillars,
+        {
+          number: String(currentPillars.length + 1).padStart(2, '0'),
+          title: 'New Capability',
+          text: 'Description of the global export capability or trade service.',
+          order: currentPillars.length + 1,
+          isActive: true,
+        },
+      ],
+    });
+  };
+
+  const removePillar = (i) => {
+    const currentPillars = current.pillars || defaults.globalMap.pillars;
+    setSection({
+      ...current,
+      pillars: currentPillars.filter((_, index) => index !== i),
+    });
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="label">Eyebrow</label>
+          <input
+            className="field"
+            value={current.eyebrow || ''}
+            onChange={(e) => setSection({ ...current, eyebrow: e.target.value })}
+          />
+        </div>
+        <div>
+          <label className="label">Title</label>
+          <input
+            className="field"
+            value={current.title || ''}
+            onChange={(e) => setSection({ ...current, title: e.target.value })}
+          />
+        </div>
+      </div>
+      <div>
+        <label className="label">Description</label>
+        <textarea
+          className="field"
+          rows="2"
+          value={current.description || ''}
+          onChange={(e) => setSection({ ...current, description: e.target.value })}
+        />
+      </div>
+
+      <div className="flex items-center justify-between border-t border-line pt-4">
+        <div>
+          <h3 className="font-display font-bold text-ink">Served Regions & Trade Corridors</h3>
+          <p className="text-xs text-ink/60">Manage countries, coordinates, transit days, and entry ports shown on the map.</p>
+        </div>
+        <button type="button" className="btn-primary text-xs" onClick={addRegion}>
+          + Add Region
+        </button>
+      </div>
+
+      <div className="space-y-4">
+        {(current.regions || []).map((region, i) => (
+          <div key={region._id || i} className="rounded-xl border border-line bg-paper p-5">
+            <div className="flex items-center justify-between border-b border-line/60 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="rounded bg-forest/10 px-2 py-0.5 font-mono text-xs font-bold text-forest">
+                  {region.code || `REG-${i + 1}`}
+                </span>
+                <span className="font-display font-bold text-ink">{region.name || 'Untitled Region'}</span>
+              </div>
+              <button
+                type="button"
+                className="text-sm text-clay hover:underline"
+                onClick={() => removeRegion(i)}
+              >
+                Delete Region
+              </button>
+            </div>
+
+            <div className="mt-4 grid gap-4 sm:grid-cols-3">
+              <div>
+                <label className="label">Region Name</label>
+                <input
+                  className="field"
+                  value={region.name || ''}
+                  onChange={(e) => updateRegion(i, 'name', e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="label">Short Code / Badge</label>
+                <input
+                  className="field"
+                  value={region.code || ''}
+                  onChange={(e) => updateRegion(i, 'code', e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="label">Transit Duration</label>
+                <input
+                  className="field"
+                  value={region.transitTime || ''}
+                  placeholder="e.g. 24 – 28 Days"
+                  onChange={(e) => updateRegion(i, 'transitTime', e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="label">Pin X Coordinate (0-1000)</label>
+                <input
+                  type="number"
+                  className="field"
+                  value={region.x ?? 500}
+                  onChange={(e) => updateRegion(i, 'x', Number(e.target.value))}
+                />
+              </div>
+              <div>
+                <label className="label">Pin Y Coordinate (0-500)</label>
+                <input
+                  type="number"
+                  className="field"
+                  value={region.y ?? 250}
+                  onChange={(e) => updateRegion(i, 'y', Number(e.target.value))}
+                />
+              </div>
+              <div>
+                <label className="label">On-time Transit Rate</label>
+                <input
+                  className="field"
+                  value={region.deliveryRate || '99.4%'}
+                  onChange={(e) => updateRegion(i, 'deliveryRate', e.target.value)}
+                />
+              </div>
+
+              <div className="sm:col-span-3">
+                <label className="label">Primary Entry Ports (separated by comma)</label>
+                <input
+                  className="field"
+                  value={Array.isArray(region.ports) ? region.ports.join(', ') : region.ports || ''}
+                  placeholder="e.g. New York / New Jersey, Long Beach, Houston"
+                  onChange={(e) =>
+                    updateRegion(
+                      i,
+                      'ports',
+                      e.target.value.split(',').map((s) => s.trim()).filter(Boolean)
+                    )
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="mt-3 flex items-center justify-between">
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={region.isActive !== false}
+                  onChange={(e) => updateRegion(i, 'isActive', e.target.checked)}
+                />{' '}
+                Active corridor
+              </label>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-ink/50">Order:</span>
+                <input
+                  type="number"
+                  className="field w-20 py-1 text-xs"
+                  value={region.order ?? i + 1}
+                  onChange={(e) => updateRegion(i, 'order', Number(e.target.value))}
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Global Capabilities 4-Pillar Bar Editor */}
+      <div className="flex items-center justify-between border-t border-line pt-8">
+        <div>
+          <h3 className="font-display font-bold text-ink">Global Capabilities Cards (Beneath Map)</h3>
+          <p className="text-xs text-ink/60">Edit the capability pillars displayed directly under the world trade map.</p>
+        </div>
+        <button type="button" className="btn-primary text-xs" onClick={addPillar}>
+          + Add Capability Card
+        </button>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        {(current.pillars || defaults.globalMap.pillars).map((pillar, i) => (
+          <div key={pillar._id || i} className="rounded-xl border border-line bg-paper p-5 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between border-b border-line/60 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="rounded bg-gold/15 px-2 py-0.5 font-mono text-xs font-bold text-gold">
+                    {pillar.number || String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span className="font-display font-bold text-ink">{pillar.title || 'Untitled Capability'}</span>
+                </div>
+                <button
+                  type="button"
+                  className="text-sm text-clay hover:underline"
+                  onClick={() => removePillar(i)}
+                >
+                  Delete
+                </button>
+              </div>
+
+              <div className="mt-4 space-y-3">
+                <div className="grid grid-cols-[80px_1fr] gap-3">
+                  <div>
+                    <label className="label">Index #</label>
+                    <input
+                      className="field font-mono"
+                      value={pillar.number || ''}
+                      placeholder="01"
+                      onChange={(e) => updatePillar(i, 'number', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="label">Card Title</label>
+                    <input
+                      className="field"
+                      value={pillar.title || ''}
+                      placeholder="e.g. 6 Global Corridors"
+                      onChange={(e) => updatePillar(i, 'title', e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="label">Description Text</label>
+                  <textarea
+                    className="field"
+                    rows="3"
+                    value={pillar.text || ''}
+                    placeholder="Established logistics networks reaching USA, Europe..."
+                    onChange={(e) => updatePillar(i, 'text', e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 flex items-center justify-between border-t border-line/50 pt-3">
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={pillar.isActive !== false}
+                  onChange={(e) => updatePillar(i, 'isActive', e.target.checked)}
+                />{' '}
+                Visible on site
+              </label>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-ink/50">Order:</span>
+                <input
+                  type="number"
+                  className="field w-16 py-1 text-xs"
+                  value={pillar.order ?? i + 1}
+                  onChange={(e) => updatePillar(i, 'order', Number(e.target.value))}
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CertificatesEditor({ section, setSection }) {
+  const current = section || defaults.certificates;
+  const updateCert = (i, key, value) => {
+    const items = [...(current.items || [])];
+    items[i] = { ...items[i], [key]: value };
+    setSection({ ...current, items });
+  };
+
+  const addCert = () => {
+    setSection({
+      ...current,
+      items: [
+        ...(current.items || []),
+        {
+          name: 'New Certification',
+          issuer: 'Authorized Regulatory Body',
+          code: 'fssai',
+          image: '',
+          description: 'Official verified compliance license and benchmark.',
+          highlights: ['Mandatory compliance', 'Quality assured'],
+          order: (current.items?.length || 0) + 1,
+          isActive: true,
+        },
+      ],
+    });
+  };
+
+  const removeCert = (i) => {
+    setSection({
+      ...current,
+      items: (current.items || []).filter((_, index) => index !== i),
+    });
+  };
+
+  const presets = [
+    { code: 'fssai', label: 'FSSAI (Food Safety and Standards Authority)' },
+    { code: 'apeda', label: 'APEDA (Agricultural & Processed Food)' },
+    { code: 'gmp', label: 'GMP (Good Manufacturing Practice)' },
+    { code: 'ghp', label: 'GHP (Good Hygiene Practices)' },
+    { code: 'haccp', label: 'HACCP (Hazard Analysis Critical Control Point)' },
+    { code: 'iso22000', label: 'ISO 22000 (Food Safety Management)' },
+    { code: 'asta', label: 'ASTA (American Spice Trade Association)' },
+    { code: 'custom', label: 'Custom Uploaded Logo' },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="label">Eyebrow</label>
+          <input
+            className="field"
+            value={current.eyebrow || ''}
+            onChange={(e) => setSection({ ...current, eyebrow: e.target.value })}
+          />
+        </div>
+        <div>
+          <label className="label">Title</label>
+          <input
+            className="field"
+            value={current.title || ''}
+            onChange={(e) => setSection({ ...current, title: e.target.value })}
+          />
+        </div>
+      </div>
+      <div>
+        <label className="label">Description</label>
+        <textarea
+          className="field"
+          rows="2"
+          value={current.description || ''}
+          onChange={(e) => setSection({ ...current, description: e.target.value })}
+        />
+      </div>
+
+      <div className="flex items-center justify-between border-t border-line pt-4">
+        <div>
+          <h3 className="font-display font-bold text-ink">Certificates & Compliance Badges</h3>
+          <p className="text-xs text-ink/60">Display official certification logos and accreditation standards.</p>
+        </div>
+        <button type="button" className="btn-primary text-xs" onClick={addCert}>
+          + Add Certificate
+        </button>
+      </div>
+
+      <div className="space-y-5">
+        {(current.items || []).map((cert, i) => (
+          <div key={cert._id || i} className="rounded-xl border border-line bg-paper p-5">
+            <div className="flex items-center justify-between border-b border-line/60 pb-3">
+              <div className="flex items-center gap-3">
+                <div className="grid h-12 w-16 place-items-center rounded-lg border border-line bg-white p-1">
+                  {cert.image ? (
+                    <img src={asset(cert.image)} alt="" className="h-full w-full object-contain" />
+                  ) : (
+                    <img
+                      src={`/certificates/${cert.code || 'fssai'}.png`}
+                      alt=""
+                      className="h-full w-full object-contain"
+                    />
+                  )}
+                </div>
+                <div>
+                  <span className="font-display font-bold text-ink">{cert.name || 'Untitled Certification'}</span>
+                  <p className="text-xs text-ink/50">{cert.issuer || 'Regulatory authority'}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="text-sm text-clay hover:underline"
+                onClick={() => removeCert(i)}
+              >
+                Delete Certificate
+              </button>
+            </div>
+
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="label">Certificate Name</label>
+                <input
+                  className="field"
+                  value={cert.name || ''}
+                  onChange={(e) => updateCert(i, 'name', e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="label">Issuing Authority / Subtitle</label>
+                <input
+                  className="field"
+                  value={cert.issuer || ''}
+                  onChange={(e) => updateCert(i, 'issuer', e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="label">Official Logo Preset</label>
+                <select
+                  className="field"
+                  value={cert.code || 'fssai'}
+                  onChange={(e) => updateCert(i, 'code', e.target.value)}
+                >
+                  {presets.map((p) => (
+                    <option key={p.code} value={p.code}>
+                      {p.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <ImageUpload
+                  label="Or Upload Custom Logo Image (optional)"
+                  value={cert.image || ''}
+                  onChange={(url) => updateCert(i, 'image', url)}
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="label">Description / Scope of Accreditation</label>
+                <textarea
+                  className="field"
+                  rows="2"
+                  value={cert.description || ''}
+                  onChange={(e) => updateCert(i, 'description', e.target.value)}
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="label">Highlights (comma separated)</label>
+                <input
+                  className="field"
+                  value={Array.isArray(cert.highlights) ? cert.highlights.join(', ') : cert.highlights || ''}
+                  placeholder="e.g. Zero adulteration mandate, Periodic lab assays, Full farm traceability"
+                  onChange={(e) =>
+                    updateCert(
+                      i,
+                      'highlights',
+                      e.target.value.split(',').map((s) => s.trim()).filter(Boolean)
+                    )
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="mt-4 flex items-center justify-between border-t border-line/50 pt-3">
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={cert.isActive !== false}
+                  onChange={(e) => updateCert(i, 'isActive', e.target.checked)}
+                />{' '}
+                Active & displayed in slider
+              </label>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-ink/50">Order:</span>
+                <input
+                  type="number"
+                  className="field w-20 py-1 text-xs"
+                  value={cert.order ?? i + 1}
+                  onChange={(e) => updateCert(i, 'order', Number(e.target.value))}
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function FlashCardEditor({ section, setSection }) {
+  const current = section || defaults.flashCard;
+  const update = (key, value) => {
+    setSection({ ...current, [key]: value });
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-2xl border border-line bg-paper p-5 sm:p-6 space-y-5">
+        <div className="flex items-center justify-between border-b border-line/60 pb-4">
+          <div>
+            <h3 className="font-display text-base font-bold text-ink">Flash Card Popup Settings</h3>
+            <p className="text-xs text-ink/60">
+              When enabled, visitors see this advertisement / announcement card right after the brand loader finishes on their initial visit.
+            </p>
+          </div>
+          <label className="flex items-center gap-2 cursor-pointer font-medium text-sm text-ink">
+            <input
+              type="checkbox"
+              checked={current.isActive !== false}
+              onChange={(e) => update('isActive', e.target.checked)}
+              className="h-4 w-4 rounded border-line text-forest focus:ring-forest"
+            />
+            <span>Active on Website</span>
+          </label>
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="space-y-4">
+            <div>
+              <label className="label">Flash Card Title</label>
+              <input
+                className="field"
+                value={current.title || ''}
+                placeholder="e.g. India’s Taste. The World’s Table"
+                onChange={(e) => update('title', e.target.value)}
+              />
+            </div>
+
+            <div>
+              <label className="label">Subtitle / Advertisement Message</label>
+              <textarea
+                className="field"
+                rows="3"
+                value={current.subtitle || ''}
+                placeholder="e.g. Direct sourcing of export-grade Indian spices, premium grains, and agro-commodities..."
+                onChange={(e) => update('subtitle', e.target.value)}
+              />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="label">Button Text</label>
+                <input
+                  className="field"
+                  value={current.buttonText || ''}
+                  placeholder="e.g. Explore Products"
+                  onChange={(e) => update('buttonText', e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="label">Button Destination URL</label>
+                <input
+                  className="field"
+                  value={current.buttonLink || ''}
+                  placeholder="e.g. /products or /inquiry"
+                  onChange={(e) => update('buttonLink', e.target.value)}
+                />
+              </div>
+            </div>
+
+            <ImageUpload
+              label="Flash Card Photo / Poster Image"
+              value={current.image || ''}
+              onChange={(url) => update('image', url)}
+            />
+          </div>
+
+          {/* Live Preview Box */}
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-line bg-paper/60 p-5">
+            <p className="text-xs font-mono uppercase tracking-wider text-ink/40 mb-3">Live Visual Preview</p>
+            <div className="relative w-full max-w-sm overflow-hidden rounded-2xl border border-gold/40 bg-ink text-paper shadow-2xl">
+              {current.image ? (
+                <div className="relative aspect-[16/9] w-full overflow-hidden bg-forest/20">
+                  <img src={asset(current.image)} alt="Preview" className="h-full w-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink via-transparent to-transparent opacity-80" />
+                </div>
+              ) : (
+                <div className="flex aspect-[16/9] w-full items-center justify-center bg-forest/30 text-xs text-paper/40">
+                  (No photo uploaded yet)
+                </div>
+              )}
+              <div className="p-5 text-center">
+                <span className="inline-block rounded-full border border-gold/30 bg-gold/10 px-2.5 py-0.5 font-mono text-[10px] text-gold uppercase tracking-widest mb-2">
+                  Special Announcement
+                </span>
+                <h4 className="font-display text-lg font-bold text-white leading-snug">
+                  {current.title || 'Your Flash Card Title'}
+                </h4>
+                {current.subtitle && (
+                  <p className="mt-2 text-xs leading-relaxed text-paper/70">
+                    {current.subtitle}
+                  </p>
+                )}
+                <div className="mt-4">
+                  <span className="inline-block rounded-lg bg-forest px-4 py-2 text-xs font-semibold text-paper shadow border border-gold/30">
+                    {current.buttonText || 'Explore Products'} →
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function ManageSiteContent() {
+  const [content, setContent] = useState(clone(defaults));
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [tab, setTab] = useState('home');
+
+  useEffect(() => {
+    api
+      .get('/site-content')
+      .then((r) => setContent({ ...clone(defaults), ...r.data }))
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const save = async () => {
+    setBusy(true);
+    setError('');
+    setMessage('');
+    try {
+      const r = await api.put('/site-content', content);
+      setContent(r.data);
+      setMessage('Changes saved successfully.');
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const setSection = (key, value) => setContent({ ...content, [key]: value });
+
+  if (loading) return <p className="text-sm text-ink/60">Loading site content…</p>;
+
+  const tabs = [
+    ['home', 'Home'],
+    ['flashcard', 'Flash Card / Ad Popup'],
+    ['map', 'Global Map'],
+    ['certificates', 'Certificates'],
+    ['about', 'About'],
+    ['inquiry', 'Inquiry'],
+    ['testimonials', 'Testimonials'],
+  ];
+
+  return (
+    <div className="max-w-6xl">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="font-display text-2xl font-extrabold">Site Content</h1>
+          <p className="mt-1 text-sm text-ink/60">
+            Manage website text, global map corridors, certificates, hero slides, and sections dynamically.
+          </p>
+        </div>
+        <button className="btn-primary" onClick={save} disabled={busy}>
+          {busy ? 'Saving…' : 'Save all changes'}
+        </button>
+      </div>
+
+      {message && <p className="mt-4 rounded-lg bg-forest/10 px-3 py-2 text-sm text-forest">{message}</p>}
+      {error && <p className="mt-4 rounded-lg bg-clay/10 px-3 py-2 text-sm text-clay">{error}</p>}
+
+      <div className="mt-6 flex flex-wrap gap-2 border-b border-line pb-3">
+        {tabs.map(([key, label]) => (
+          <button
+            key={key}
+            className={`rounded-full px-4 py-2 text-sm font-medium ${
+              tab === key ? 'bg-forest text-paper' : 'bg-white text-ink/70 hover:bg-line'
+            }`}
+            onClick={() => setTab(key)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'home' && (
+        <div className="mt-6 space-y-6">
+          <section className="rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
+            <h2 className="font-display text-lg font-bold">Home — Hero Video & Ad Slider</h2>
+            <p className="mt-1 text-sm text-ink/60">
+              Change the first screen of the Home page. Add/remove commercial slides, upload product ad videos (MP4/WebM) and fallback images.
+            </p>
+            <div className="mt-5">
+              <ItemEditor section={content.homeHero} setSection={(v) => setSection('homeHero', v)} image video />
+            </div>
+          </section>
+          <section className="rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
+            <h2 className="font-display text-lg font-bold">Home — What We Offer</h2>
+            <div className="mt-5">
+              <ItemEditor section={content.homeOfferings} setSection={(v) => setSection('homeOfferings', v)} />
+            </div>
+          </section>
+          <section className="rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
+            <h2 className="font-display text-lg font-bold">Home — How We Work</h2>
+            <div className="mt-5">
+              <ItemEditor section={content.homeHowWeWork} setSection={(v) => setSection('homeHowWeWork', v)} />
+            </div>
+          </section>
+        </div>
+      )}
+
+      {tab === 'flashcard' && (
+        <section className="mt-6 rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
+          <h2 className="font-display text-lg font-bold">First-Visit Flash Card / Ad Popup</h2>
+          <p className="mt-1 text-sm text-ink/60">
+            Customize the promotional announcement card shown to visitors right after the brand loader finishes on their initial visit.
+          </p>
+          <div className="mt-5">
+            <FlashCardEditor
+              section={content.flashCard}
+              setSection={(v) => setSection('flashCard', v)}
+            />
+          </div>
+        </section>
+      )}
+
+      {tab === 'map' && (
+        <section className="mt-6 rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
+          <h2 className="font-display text-lg font-bold">Home — Global Served Map</h2>
+          <p className="mt-1 text-sm text-ink/60">Customize active export corridors, pin positions, ports and transit duration.</p>
+          <div className="mt-5">
+            <MapEditor section={content.globalMap} setSection={(v) => setSection('globalMap', v)} />
+          </div>
+        </section>
+      )}
+
+      {tab === 'certificates' && (
+        <section className="mt-6 rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
+          <h2 className="font-display text-lg font-bold">Home — Certificates Slider</h2>
+          <p className="mt-1 text-sm text-ink/60">Add, reorder, or update company certification seals and accreditation logos.</p>
+          <div className="mt-5">
+            <CertificatesEditor section={content.certificates} setSection={(v) => setSection('certificates', v)} />
+          </div>
+        </section>
+      )}
+
+      {tab === 'about' && (
+        <div className="mt-6 space-y-6">
+          <section className="rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
+            <h2 className="font-display text-lg font-bold">About — First Section</h2>
+            <p className="mt-1 text-sm text-ink/60">This controls the first About section.</p>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="label">Eyebrow</label>
+                <input
+                  className="field"
+                  value={content.aboutHero.eyebrow || ''}
+                  onChange={(e) => setSection('aboutHero', { ...content.aboutHero, eyebrow: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="label">Heading</label>
+                <input
+                  className="field"
+                  value={content.aboutHero.title || ''}
+                  onChange={(e) => setSection('aboutHero', { ...content.aboutHero, title: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="mt-4">
+              <label className="label">Description</label>
+              <textarea
+                className="field"
+                rows="4"
+                value={content.aboutHero.description || ''}
+                onChange={(e) => setSection('aboutHero', { ...content.aboutHero, description: e.target.value })}
+              />
+            </div>
+          </section>
+          <section className="rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
+            <h2 className="font-display text-lg font-bold">About — Our Approach</h2>
+            <div className="mt-5">
+              <ItemEditor section={content.aboutApproach} setSection={(v) => setSection('aboutApproach', v)} image side />
+            </div>
+          </section>
+          <section className="rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
+            <h2 className="font-display text-lg font-bold">About — Why Choose Us</h2>
+            <div className="mt-5">
+              <ItemEditor section={content.aboutWhyChooseUs} setSection={(v) => setSection('aboutWhyChooseUs', v)} />
+            </div>
+          </section>
+        </div>
+      )}
+
+      {tab === 'inquiry' && (
+        <section className="mt-6 rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
+          <h2 className="font-display text-lg font-bold">Inquiry / Get a Quote</h2>
+          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="label">Eyebrow</label>
+              <input
+                className="field"
+                value={content.inquiryHero.eyebrow || ''}
+                onChange={(e) => setSection('inquiryHero', { ...content.inquiryHero, eyebrow: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="label">Heading</label>
+              <input
+                className="field"
+                value={content.inquiryHero.title || ''}
+                onChange={(e) => setSection('inquiryHero', { ...content.inquiryHero, title: e.target.value })}
+              />
+            </div>
+          </div>
+          <div className="mt-4">
+            <label className="label">Description</label>
+            <textarea
+              className="field"
+              rows="4"
+              value={content.inquiryHero.description || ''}
+              onChange={(e) => setSection('inquiryHero', { ...content.inquiryHero, description: e.target.value })}
+            />
+          </div>
+        </section>
+      )}
+
+      {tab === 'testimonials' && (
+        <section className="mt-6 rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
+          <h2 className="font-display text-lg font-bold">About — Client Feedback</h2>
+          <div className="mt-5">
+            <ItemEditor section={content.testimonials} setSection={(v) => setSection('testimonials', v)} image />
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}

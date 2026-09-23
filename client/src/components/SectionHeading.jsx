@@ -1,6 +1,6 @@
-export default function SectionHeading({ eyebrow, title, children, align = 'left' }) {
+export default function SectionHeading({ eyebrow, title, children, align = 'left', className = '' }) {
   return (
-    <div className={align === 'center' ? 'text-center' : ''}>
+    <div className={`${align === 'center' ? 'text-center' : ''} ${className}`.trim()}>
       {eyebrow && <p className="eyebrow">{eyebrow}</p>}
       <h2 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
         {title}

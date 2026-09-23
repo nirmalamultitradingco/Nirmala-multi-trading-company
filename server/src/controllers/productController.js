@@ -1,11 +1,13 @@
 import Product from '../models/Product.js';
 import Segment from '../models/Segment.js';
 import Partner from '../models/Partner.js';
+import SubSegment from '../models/SubSegment.js';
 import { asyncHandler } from '../utils/sendEmail.js';
+import { notifySubscribers } from './subscriberController.js';
 
-// GET /api/products?segment=slug&partner=slug&featured=true&search=&page=1&limit=12
+// GET /api/products?segment=slug&subSegment=slug&partner=slug&featured=true&search=&page=1&limit=12
 export const getProducts = asyncHandler(async (req, res) => {
-  const { segment, partner, featured, search, admin } = req.query;
+  const { segment, subSegment, partner, featured, search, admin } = req.query;
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 12;
 
@@ -17,10 +19,17 @@ export const getProducts = asyncHandler(async (req, res) => {
     const seg = await Segment.findOne({ slug: segment });
     filter.segment = seg ? seg._id : null;
   }
+
+  if (subSegment) {
+    const sub = await SubSegment.findOne({ slug: subSegment });
+    filter.subSegment = sub ? sub._id : null;
+  }
+
   if (partner) {
     const p = await Partner.findOne({ slug: partner });
     filter.partner = p ? p._id : null;
   }
+
   if (search) {
     filter.$or = [
       { name: { $regex: search, $options: 'i' } },
@@ -32,7 +41,8 @@ export const getProducts = asyncHandler(async (req, res) => {
   const total = await Product.countDocuments(filter);
   const products = await Product.find(filter)
     .populate('segment', 'name slug')
-    .populate('partner', 'name slug logo')
+    .populate('subSegment', 'name slug image description')
+    .populate('partner', 'name slug logo country website')
     .sort({ featured: -1, createdAt: -1 })
     .skip((page - 1) * limit)
     .limit(limit);
@@ -44,45 +54,98 @@ export const getProducts = asyncHandler(async (req, res) => {
 export const getProductBySlug = asyncHandler(async (req, res) => {
   const product = await Product.findOne({ slug: req.params.slug })
     .populate('segment', 'name slug')
+    .populate('subSegment', 'name slug image description')
     .populate('partner', 'name slug logo country website');
+
   if (!product) {
     res.status(404);
     throw new Error('Product not found.');
   }
-  const related = await Product.find({
-    segment: product.segment?._id,
+
+  const relatedFilter = {
     _id: { $ne: product._id },
     isActive: true,
-  })
+  };
+
+  if (product.subSegment?._id) {
+    relatedFilter.subSegment = product.subSegment._id;
+  } else {
+    relatedFilter.segment = product.segment?._id;
+  }
+
+  const related = await Product.find(relatedFilter)
     .limit(4)
     .select('name slug image shortDescription origin');
+
   res.json({ product, related });
 });
 
-// POST /api/products  (admin)
+// POST /api/products (admin)
 export const createProduct = asyncHandler(async (req, res) => {
   const product = await Product.create(req.body);
+  await product.populate([
+    { path: 'segment', select: 'name slug' },
+    { path: 'subSegment', select: 'name slug' },
+    { path: 'partner', select: 'name slug logo' },
+  ]);
+
+  // Notify subscribers in background
+  notifySubscribers({
+    type: 'product',
+    title: product.name,
+    slug: product.slug,
+    excerpt: product.shortDescription || `New export commodity: ${product.name}`,
+  }).catch((err) => console.error('Subscriber alert error on product creation:', err));
+
   res.status(201).json(product);
 });
 
-// PUT /api/products/:id  (admin)
+// PUT /api/products/:id (admin)
 export const updateProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
   if (!product) {
     res.status(404);
     throw new Error('Product not found.');
   }
+
   Object.assign(product, req.body);
   await product.save();
+  await product.populate([
+    { path: 'segment', select: 'name slug' },
+    { path: 'subSegment', select: 'name slug' },
+    { path: 'partner', select: 'name slug logo' },
+  ]);
   res.json(product);
 });
 
-// DELETE /api/products/:id  (admin)
+// DELETE /api/products/:id (admin)
 export const deleteProduct = asyncHandler(async (req, res) => {
-  const product = await Product.findByIdAndDelete(req.params.id);
+  const product = await Product.findById(req.params.id);
+
   if (!product) {
     res.status(404);
     throw new Error('Product not found.');
   }
-  res.json({ message: 'Product deleted.' });
+
+  const subSegmentId = product.subSegment;
+  await product.deleteOne();
+
+  let subSegmentDeleted = false;
+
+  // Remove an empty sub-segment automatically after its last product is deleted.
+  if (subSegmentId) {
+    const remainingProducts = await Product.countDocuments({
+      subSegment: subSegmentId,
+    });
+
+    if (remainingProducts === 0) {
+      const deletedSubSegment = await SubSegment.findByIdAndDelete(subSegmentId);
+      subSegmentDeleted = Boolean(deletedSubSegment);
+    }
+  }
+
+  res.json({
+    message: 'Product deleted.',
+    subSegmentDeleted,
+  });
 });

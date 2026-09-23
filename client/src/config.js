@@ -1,9 +1,10 @@
-// One place to rebrand the whole site.
+// Central brand configuration used across the public site and admin panel.
 export const BRAND = {
-  name: 'Nirmala Multitrading Co.',
-  tagline: 'Growers to global shelves',
+  name: 'NMC',
+  fullName: 'Nirmala Multitrading Co.',
+  tagline: "India’s Taste. The World’s Table",
   blurb:
-    'We partner with growers and food companies to bring certified, export-ready products to buyers worldwide.',
+    'India’s Taste. The World’s Table — connecting trusted Indian food products with international buyers.',
   email: 'nirmalamultitradingco@gmail.com',
   phone: '+91 7069826082',
   address: 'Surat, Gujarat, India',

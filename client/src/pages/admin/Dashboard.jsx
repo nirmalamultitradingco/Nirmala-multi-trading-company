@@ -23,8 +23,8 @@ export default function Dashboard() {
   }, []);
 
   const cards = [
-    { label: 'Segments', value: stats?.segments, to: '/admin/segments' },
-    { label: 'Products', value: stats?.products, to: '/admin/products' },
+    { label: 'Products', value: stats?.segments, to: '/admin/segments' },
+    { label: 'Product Details', value: stats?.products, to: '/admin/products' },
     { label: 'Partners', value: stats?.partners, to: '/admin/partners' },
     { label: 'Inquiries', value: stats?.inquiries, to: '/admin/inquiries', badge: stats?.newInquiries },
   ];
@@ -59,8 +59,9 @@ export default function Dashboard() {
       <div className="mt-8 rounded-xl border border-line bg-white p-5 shadow-card">
         <h2 className="font-display text-lg font-bold text-ink">Quick actions</h2>
         <div className="mt-3 flex flex-wrap gap-2">
-          <Link to="/admin/products" className="btn-primary">Add a product</Link>
-          <Link to="/admin/segments" className="btn-outline">Add a segment</Link>
+          <Link to="/admin/segments" className="btn-primary">Add a product</Link>
+          <Link to="/admin/subsegments" className="btn-outline">Add a sub product</Link>
+          <Link to="/admin/products" className="btn-outline">Add product details</Link>
           <Link to="/admin/partners" className="btn-outline">Add a partner</Link>
           <Link to="/admin/brochures" className="btn-outline">Upload a brochure</Link>
         </div>

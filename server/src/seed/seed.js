@@ -7,6 +7,7 @@ import Partner from '../models/Partner.js';
 import Product from '../models/Product.js';
 import Brochure from '../models/Brochure.js';
 import Inquiry from '../models/Inquiry.js';
+import News from '../models/News.js';
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ const run = async () => {
     Product.deleteMany(),
     Brochure.deleteMany(),
     Inquiry.deleteMany(),
+    News.deleteMany(),
   ]);
 
   // ---- Admin user ----
@@ -201,6 +203,18 @@ const run = async () => {
     },
   ]);
   console.log('Brochures created (note: replace demo file paths by uploading real PDFs in admin).');
+
+  await News.create([{
+    title: 'NMC expands its export-ready Indian food portfolio',
+    excerpt: 'NMC is expanding its product portfolio to support international buyers across snacks, frozen foods, beverages and traditional Indian foods.',
+    content: 'NMC continues to build a practical export platform for international buyers, bringing product sourcing, documentation and shipment coordination together in one place.\n\nBuyers can contact the NMC team for product specifications, samples, packaging requirements and market-specific export support.',
+    image: '/NMC logo.png',
+    publishedAt: new Date(),
+    featured: true,
+    order: 1,
+    isActive: true,
+  }]);
+  console.log('News created: 1');
 
   console.log('\nSeed complete. Sign in to the admin panel with the credentials in your .env.');
   await mongoose.connection.close();

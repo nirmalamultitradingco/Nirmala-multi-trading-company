@@ -31,7 +31,7 @@ export default function ManageSegments() {
   };
 
   const remove = async (s) => {
-    if (!confirm(`Delete segment "${s.name}"?`)) return;
+    if (!confirm(`Delete product "${s.name}"?`)) return;
     try { await api.delete(`/segments/${s._id}`); load(); }
     catch (err) { alert(err.message); }
   };
@@ -40,10 +40,10 @@ export default function ManageSegments() {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-extrabold text-ink">Segments</h1>
-          <p className="mt-1 text-sm text-ink/60">Product categories shown across the site.</p>
+          <h1 className="font-display text-2xl font-extrabold text-ink">Products</h1>
+          <p className="mt-1 text-sm text-ink/60">Product categories shown across the site. Order is automatically normalized after every save and delete.</p>
         </div>
-        <button className="btn-primary" onClick={openNew}>+ New segment</button>
+        <button className="btn-primary" onClick={openNew}>+ New product</button>
       </div>
 
       <div className="mt-6 grid gap-3">
@@ -52,6 +52,7 @@ export default function ManageSegments() {
             <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-lg bg-line">
               {s.image ? <img src={s.image.startsWith('http') ? s.image : s.image} alt="" className="h-full w-full object-cover" /> : <span className="text-ink/30">—</span>}
             </div>
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-forest text-xs font-bold text-paper">#{s.order}</div>
             <div className="min-w-0 flex-1">
               <p className="font-display font-bold text-ink">{s.name}</p>
               <p className="truncate text-sm text-ink/55">{s.description}</p>
@@ -61,10 +62,10 @@ export default function ManageSegments() {
             <button className="text-sm font-medium text-clay hover:underline" onClick={() => remove(s)}>Delete</button>
           </div>
         ))}
-        {items.length === 0 && <p className="text-sm text-ink/50">No segments yet.</p>}
+        {items.length === 0 && <p className="text-sm text-ink/50">No products yet.</p>}
       </div>
 
-      <Modal open={open} title={editing ? 'Edit segment' : 'New segment'} onClose={() => setOpen(false)}>
+      <Modal open={open} title={editing ? 'Edit product' : 'New product'} onClose={() => setOpen(false)}>
         <form onSubmit={save} className="space-y-4">
           <div>
             <label className="label">Name *</label>
