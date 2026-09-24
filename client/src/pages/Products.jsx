@@ -50,8 +50,15 @@ export default function Products() {
     setParam('segment', slug);
   };
 
-  const handleSearchSubmit = () => {
-    setParam('search', search.trim());
+  const handleSearchSubmit = (term) => {
+    const query = typeof term === 'string' ? term : search;
+    setParam('search', query.trim());
+    setSearch(''); // Requirement 1: Blank the search field
+  };
+
+  const handleClearSearch = () => {
+    setParam('search', '');
+    setSearch('');
   };
 
   const gotoPage = (p) => {
@@ -60,6 +67,8 @@ export default function Products() {
     setParams(next);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const currentSegmentObj = segments.find((s) => s.slug === segment);
 
   return (
     <div className="container-x py-10 md:py-16 space-y-8">
@@ -74,15 +83,30 @@ export default function Products() {
         </p>
       </div>
 
-      {/* Category Pill Bar & Search (Slide bar completely eliminated) */}
+      {/* Category Pill Bar & Search */}
       <CategoryPillBar
         segments={segments}
         activeSegment={segment}
         onSelectSegment={handleSelectSegment}
         search={search}
+        activeSearch={params.get('search') || ''}
         onSearchChange={setSearch}
         onSearchSubmit={handleSearchSubmit}
+        onClearSearch={handleClearSearch}
       />
+
+      {/* Segment and Product Alignment Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-line/60 pb-3">
+        <div>
+          <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-gold">Category</span>
+          <h2 className="font-display text-xl sm:text-2xl font-bold text-ink">
+            {currentSegmentObj ? currentSegmentObj.name : 'All Product Categories'}
+          </h2>
+        </div>
+        <span className="font-mono text-xs font-semibold text-moss bg-forest/5 px-3 py-1 rounded-full border border-forest/15">
+          {data.total} Available Items
+        </span>
+      </div>
 
       {loading ? (
         <div className="py-20"><Loader /></div>

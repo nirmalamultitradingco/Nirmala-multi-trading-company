@@ -60,6 +60,14 @@ export default function AdminLayout() {
     }
   }, [location.pathname]);
 
+  // Set crisp Admin document title
+  useEffect(() => {
+    const active = links.find((l) =>
+      l.end ? location.pathname === l.to : location.pathname.startsWith(l.to)
+    );
+    document.title = active ? `NMC Admin | ${active.label}` : 'NMC Admin Portal';
+  }, [location.pathname]);
+
   const signOut = () => {
     logout();
     navigate('/admin/login');

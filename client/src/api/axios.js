@@ -37,24 +37,29 @@
 
 import axios from 'axios';
 
+// Dynamically compute the API base URL from environment or fallback to relative '/api'
+const getDynamicApiBase = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (!envUrl) return '/api';
+  const trimmed = envUrl.trim().replace(/\/+$/, '');
+  return trimmed.endsWith('/api') ? trimmed : `${trimmed}/api`;
+};
+
 const api = axios.create({
-  // Same Vercel project:
-  // https://your-domain.vercel.app/api
-  baseURL: '/api',
+  baseURL: getDynamicApiBase(),
+  timeout: 30000,
 });
 
-// Attach admin token when present.
+// Dynamically attach admin JWT token when present in storage
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-
   return config;
 });
 
-// Normalise error messages.
+// Normalise error messages and handle expired/invalid JWT tokens gracefully
 api.interceptors.response.use(
   (res) => res,
   (err) => {
@@ -63,10 +68,7 @@ api.interceptors.response.use(
       err.message ||
       'Network error. Please try again.';
 
-    if (
-      err.response?.status === 401 &&
-      localStorage.getItem('token')
-    ) {
+    if (err.response?.status === 401 && localStorage.getItem('token')) {
       localStorage.removeItem('token');
     }
 
@@ -74,15 +76,24 @@ api.interceptors.response.use(
   }
 );
 
-// Handle uploaded assets.
+// Fully dynamic asset URL resolver for uploads, certificates, and external CDN media
 export const asset = (src) => {
   if (!src) return '';
 
-  if (src.startsWith('http://') || src.startsWith('https://')) {
+  // Already an absolute URL or inline data URI
+  if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('data:')) {
     return src;
   }
 
-  return src;
+  const cleanSrc = src.startsWith('/') ? src : `/${src}`;
+  const envUrl = import.meta.env.VITE_API_URL;
+
+  if (envUrl) {
+    const baseHost = envUrl.trim().replace(/\/api\/?$/, '').replace(/\/+$/, '');
+    return `${baseHost}${cleanSrc}`;
+  }
+
+  return cleanSrc;
 };
 
 export default api;

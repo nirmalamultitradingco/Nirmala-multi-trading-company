@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { BRAND } from '../../config.js';
@@ -9,6 +9,13 @@ export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const emailInputRef = useRef(null);
+
+  useEffect(() => {
+    document.title = 'NMC Admin | Sign In';
+    // Auto-focus first field
+    emailInputRef.current?.focus();
+  }, []);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -47,6 +54,8 @@ export default function Login() {
               <input
                 id="email"
                 type="email"
+                ref={emailInputRef}
+                autoFocus
                 className="field"
                 required
                 value={form.email}

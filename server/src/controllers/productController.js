@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Product from '../models/Product.js';
 import Segment from '../models/Segment.js';
 import Partner from '../models/Partner.js';
@@ -5,31 +6,47 @@ import SubSegment from '../models/SubSegment.js';
 import { asyncHandler } from '../utils/sendEmail.js';
 import { notifySubscribers } from './subscriberController.js';
 
-// GET /api/products?segment=slug&subSegment=slug&partner=slug&featured=true&search=&page=1&limit=12
+// GET /api/products?segment=slugOrId&subSegment=slugOrId&partner=slugOrId&featured=true&search=&page=1&limit=12&sort=latest
 export const getProducts = asyncHandler(async (req, res) => {
-  const { segment, subSegment, partner, featured, search, admin } = req.query;
-  const page = Number(req.query.page) || 1;
-  const limit = Number(req.query.limit) || 12;
+  const { segment, subSegment, partner, featured, search, admin, sort, newArrival } = req.query;
+  const page = Math.max(1, Number(req.query.page) || 1);
+  const limit = Math.max(1, Number(req.query.limit) || 12);
 
   const filter = {};
   if (admin !== 'true') filter.isActive = true;
   if (featured === 'true') filter.featured = true;
 
+  // Dynamic Segment filter (works with either slug or MongoDB ObjectId)
   if (segment) {
-    const seg = await Segment.findOne({ slug: segment });
+    const isId = mongoose.Types.ObjectId.isValid(segment);
+    const segQuery = isId
+      ? { $or: [{ _id: segment }, { slug: segment }] }
+      : { slug: segment };
+    const seg = await Segment.findOne(segQuery);
     filter.segment = seg ? seg._id : null;
   }
 
+  // Dynamic SubSegment filter
   if (subSegment) {
-    const sub = await SubSegment.findOne({ slug: subSegment });
+    const isId = mongoose.Types.ObjectId.isValid(subSegment);
+    const subQuery = isId
+      ? { $or: [{ _id: subSegment }, { slug: subSegment }] }
+      : { slug: subSegment };
+    const sub = await SubSegment.findOne(subQuery);
     filter.subSegment = sub ? sub._id : null;
   }
 
+  // Dynamic Partner filter
   if (partner) {
-    const p = await Partner.findOne({ slug: partner });
+    const isId = mongoose.Types.ObjectId.isValid(partner);
+    const pQuery = isId
+      ? { $or: [{ _id: partner }, { slug: partner }] }
+      : { slug: partner };
+    const p = await Partner.findOne(pQuery);
     filter.partner = p ? p._id : null;
   }
 
+  // Dynamic Search
   if (search) {
     filter.$or = [
       { name: { $regex: search, $options: 'i' } },
@@ -38,21 +55,33 @@ export const getProducts = asyncHandler(async (req, res) => {
     ];
   }
 
+  // Dynamic Sort
+  let sortOption = { featured: -1, createdAt: -1 };
+  if (sort === 'name') sortOption = { name: 1 };
+  if (sort === 'oldest') sortOption = { createdAt: 1 };
+  if (sort === 'latest' || newArrival === 'true') sortOption = { createdAt: -1 };
+
   const total = await Product.countDocuments(filter);
   const products = await Product.find(filter)
     .populate('segment', 'name slug')
     .populate('subSegment', 'name slug image description')
     .populate('partner', 'name slug logo country website')
-    .sort({ featured: -1, createdAt: -1 })
+    .sort(sortOption)
     .skip((page - 1) * limit)
     .limit(limit);
 
   res.json({ products, total, page, pages: Math.ceil(total / limit) });
 });
 
-// GET /api/products/:slug
+// GET /api/products/:slug (supports both slug AND MongoDB _id dynamically)
 export const getProductBySlug = asyncHandler(async (req, res) => {
-  const product = await Product.findOne({ slug: req.params.slug })
+  const param = req.params.slug;
+  const isId = mongoose.Types.ObjectId.isValid(param);
+  const query = isId
+    ? { $or: [{ _id: param }, { slug: param }] }
+    : { slug: param };
+
+  const product = await Product.findOne(query)
     .populate('segment', 'name slug')
     .populate('subSegment', 'name slug image description')
     .populate('partner', 'name slug logo country website');

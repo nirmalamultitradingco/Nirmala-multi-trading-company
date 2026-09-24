@@ -94,6 +94,81 @@ const defaults = {
       },
     ],
   },
+  newArrivals: {
+    isActive: true,
+    badge: 'Live Market Arrivals',
+    eyebrow: 'Fresh Crop Season 2026',
+    title: 'New product arrivals',
+    description: 'Directly sourced from verified Indian farm clusters and modern Sortex milling hubs.',
+    autoRotateSeconds: 4,
+    items: [
+      {
+        name: 'Sortex-Cleaned Cumin Seeds (Jeera)',
+        slug: 'sortex-cumin-seeds-jeera',
+        categoryName: 'Spices & Seasonings',
+        origin: 'Unjha, Gujarat',
+        image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=800&q=75',
+        shortDescription: '99.5% European purity, Sortex machine graded with volatile oil content > 3.0% and low moisture.',
+        hsCode: '090931',
+        packageType: '25kg Multi-wall Paper',
+        moq: '1 x 20ft FCL',
+        order: 1,
+        isActive: true,
+      },
+      {
+        name: '1121 Steam Basmati Rice (8.35mm+)',
+        slug: '1121-steam-basmati-rice',
+        categoryName: 'Grains & Pulses',
+        origin: 'Punjab & Haryana',
+        image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=75',
+        shortDescription: 'Extra-long slender grain, rich aroma, and 2.5x elongation upon cooking. Aflatoxin tested.',
+        hsCode: '100630',
+        packageType: '10kg / 25kg Non-Woven',
+        moq: '1 x 20ft FCL',
+        order: 2,
+        isActive: true,
+      },
+      {
+        name: 'High Curcumin Turmeric Fingers',
+        slug: 'high-curcumin-turmeric-fingers',
+        categoryName: 'Spices & Seasonings',
+        origin: 'Salem / Nizamabad',
+        image: 'https://images.unsplash.com/photo-1615485500704-8e990f9900f7?auto=format&fit=crop&w=800&q=75',
+        shortDescription: 'Deep golden yellow fingers with 3.8%–5.2% natural curcumin. Free of Sudan dyes and lead chromate.',
+        hsCode: '091030',
+        packageType: '25kg / 50kg Jute & PP',
+        moq: '1 x 20ft FCL',
+        order: 3,
+        isActive: true,
+      },
+      {
+        name: 'Dehydrated White Onion Flakes / Kibbled',
+        slug: 'dehydrated-white-onion-flakes',
+        categoryName: 'Dehydrated Foods',
+        origin: 'Mahuva, Gujarat',
+        image: 'https://images.unsplash.com/photo-1580201092675-a0a6a6cafbb1?auto=format&fit=crop&w=800&q=75',
+        shortDescription: 'Crisp, pungent dehydrated onion kibbled with moisture < 5.5%. Microbial assay for zero Salmonella.',
+        hsCode: '071220',
+        packageType: '14kg Carton with Poly Liner',
+        moq: '1 x 20ft FCL',
+        order: 4,
+        isActive: true,
+      },
+      {
+        name: 'Hulled White Sesame Seeds (99.98% Purity)',
+        slug: 'hulled-white-sesame-seeds',
+        categoryName: 'Oil Seeds & Commodities',
+        origin: 'Saurashtra, Gujarat',
+        image: 'https://images.unsplash.com/photo-1563412885-139e4045ec52?auto=format&fit=crop&w=800&q=75',
+        shortDescription: 'Mechanically hulled white sesame seeds with min 51% oil content, Sortex laser sorted.',
+        hsCode: '120740',
+        packageType: '25kg 3-Ply Paper Bags',
+        moq: '1 x 20ft FCL',
+        order: 5,
+        isActive: true,
+      },
+    ],
+  },
   flashCard: {
     isActive: true,
     title: 'India’s Taste. The World’s Table',
@@ -1473,6 +1548,262 @@ function ChatbotEditor({ section, setSection }) {
   );
 }
 
+function NewArrivalsEditor({ section, setSection }) {
+  const current = section || defaults.newArrivals;
+
+  const updateField = (field, value) => {
+    setSection({ ...current, [field]: value });
+  };
+
+  const updateItem = (i, field, value) => {
+    const items = [...(current.items || [])];
+    items[i] = { ...items[i], [field]: value };
+    setSection({ ...current, items });
+  };
+
+  const addItem = () => {
+    setSection({
+      ...current,
+      items: [
+        ...(current.items || []),
+        {
+          name: 'New Export Arrival Item',
+          slug: 'new-export-arrival-item',
+          categoryName: 'Spices & Seasonings',
+          origin: 'Gujarat, India',
+          image: '',
+          shortDescription: 'Sortex cleaned export grade commodity with certified laboratory test reports.',
+          hsCode: '',
+          packageType: '25kg Bags',
+          moq: '1 x 20ft FCL',
+          order: (current.items?.length || 0) + 1,
+          isActive: true,
+        },
+      ],
+    });
+  };
+
+  const removeItem = (i) => {
+    setSection({
+      ...current,
+      items: (current.items || []).filter((_, idx) => idx !== i),
+    });
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header & Section Metadata */}
+      <div className="rounded-2xl border border-line bg-white p-6 shadow-sm">
+        <div className="flex items-center justify-between border-b border-line pb-4 mb-4">
+          <div>
+            <h3 className="font-display font-bold text-lg text-ink">Section Headline & Rotation</h3>
+            <p className="text-xs text-ink/60">Controls the title, small category tag, badge, and carousel timer on the homepage.</p>
+          </div>
+          <label className="flex items-center gap-2 text-xs font-semibold text-ink cursor-pointer bg-forest/5 px-3 py-1.5 rounded-full border border-forest/20">
+            <input
+              type="checkbox"
+              checked={current.isActive !== false}
+              onChange={(e) => updateField('isActive', e.target.checked)}
+            />
+            <span>Active on Homepage</span>
+          </label>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="label text-xs">Eyebrow (Small Tagline)</label>
+            <input
+              className="field"
+              value={current.eyebrow || ''}
+              onChange={(e) => updateField('eyebrow', e.target.value)}
+              placeholder="e.g. Fresh Season Harvest"
+            />
+          </div>
+          <div>
+            <label className="label text-xs">Badge Pill Text</label>
+            <input
+              className="field"
+              value={current.badge || ''}
+              onChange={(e) => updateField('badge', e.target.value)}
+              placeholder="e.g. Live Market Arrivals"
+            />
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-3 mt-4">
+          <div className="sm:col-span-2">
+            <label className="label text-xs">Main Section Heading</label>
+            <input
+              className="field"
+              value={current.title || ''}
+              onChange={(e) => updateField('title', e.target.value)}
+              placeholder="e.g. New product arrivals"
+            />
+          </div>
+          <div>
+            <label className="label text-xs">Auto-Rotation Timer (Seconds)</label>
+            <input
+              type="number"
+              step="0.5"
+              min="2"
+              max="15"
+              className="field"
+              value={current.autoRotateSeconds || 4}
+              onChange={(e) => updateField('autoRotateSeconds', Number(e.target.value))}
+            />
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <label className="label text-xs">Subtitle Description</label>
+          <textarea
+            className="field text-xs"
+            rows="2"
+            value={current.description || ''}
+            onChange={(e) => updateField('description', e.target.value)}
+            placeholder="Directly sourced from verified Indian farm clusters..."
+          />
+        </div>
+      </div>
+
+      {/* Arrival Products List */}
+      <div className="rounded-2xl border border-line bg-white p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 border-b border-line pb-4">
+          <div>
+            <h3 className="font-display font-bold text-lg text-ink">
+              Featured Arrival Items ({(current.items || []).length})
+            </h3>
+            <p className="text-xs text-ink/60">Configure products, images, packaging, and origins featured in the rotating carousel.</p>
+          </div>
+          <button type="button" className="btn-primary text-xs shrink-0" onClick={addItem}>
+            + Add Arrival Product
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          {(current.items || []).map((item, i) => (
+            <div key={item._id || i} className="rounded-xl border border-line bg-[#fbf9f4] p-5 shadow-sm">
+              <div className="flex items-center justify-between border-b border-line pb-2 mb-3">
+                <span className="font-mono text-xs font-bold uppercase text-moss">Arrival Item #{i + 1}</span>
+                <button
+                  type="button"
+                  className="text-xs font-semibold text-clay hover:underline"
+                  onClick={() => removeItem(i)}
+                >
+                  Delete Item
+                </button>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div className="sm:col-span-2">
+                  <label className="label text-xs">Product Name</label>
+                  <input
+                    className="field text-sm font-semibold"
+                    value={item.name || ''}
+                    onChange={(e) => updateItem(i, 'name', e.target.value)}
+                    placeholder="e.g. Sortex-Cleaned Cumin Seeds"
+                  />
+                </div>
+                <div>
+                  <label className="label text-xs">Category Name</label>
+                  <input
+                    className="field text-sm"
+                    value={item.categoryName || ''}
+                    onChange={(e) => updateItem(i, 'categoryName', e.target.value)}
+                    placeholder="e.g. Spices & Seasonings"
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-3 mt-3">
+                <div>
+                  <label className="label text-xs">Origin Location</label>
+                  <input
+                    className="field text-xs"
+                    value={item.origin || ''}
+                    onChange={(e) => updateItem(i, 'origin', e.target.value)}
+                    placeholder="e.g. Unjha, Gujarat"
+                  />
+                </div>
+                <div>
+                  <label className="label text-xs">Package Spec</label>
+                  <input
+                    className="field text-xs"
+                    value={item.packageType || ''}
+                    onChange={(e) => updateItem(i, 'packageType', e.target.value)}
+                    placeholder="e.g. 25kg Multi-wall Paper"
+                  />
+                </div>
+                <div>
+                  <label className="label text-xs">Minimum Order (MOQ)</label>
+                  <input
+                    className="field text-xs"
+                    value={item.moq || ''}
+                    onChange={(e) => updateItem(i, 'moq', e.target.value)}
+                    placeholder="e.g. 1 x 20ft FCL"
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-3 mt-3">
+                <div className="sm:col-span-2">
+                  <label className="label text-xs">Image URL or Path</label>
+                  <input
+                    className="field text-xs font-mono"
+                    value={item.image || ''}
+                    onChange={(e) => updateItem(i, 'image', e.target.value)}
+                    placeholder="https://... or /uploads/..."
+                  />
+                </div>
+                <div>
+                  <label className="label text-xs">HS Code</label>
+                  <input
+                    className="field text-xs font-mono"
+                    value={item.hsCode || ''}
+                    onChange={(e) => updateItem(i, 'hsCode', e.target.value)}
+                    placeholder="e.g. 090931"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-3">
+                <label className="label text-xs">Specifications / Short Description</label>
+                <textarea
+                  className="field text-xs"
+                  rows="2"
+                  value={item.shortDescription || ''}
+                  onChange={(e) => updateItem(i, 'shortDescription', e.target.value)}
+                  placeholder="99.5% European purity, Sortex machine graded..."
+                />
+              </div>
+
+              <div className="mt-3 flex items-center justify-between pt-2 border-t border-line/60">
+                <label className="flex items-center gap-2 text-xs font-medium text-ink cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={item.isActive !== false}
+                    onChange={(e) => updateItem(i, 'isActive', e.target.checked)}
+                  />
+                  Active in Slider
+                </label>
+                <div className="flex items-center gap-1.5 text-xs text-ink/60">
+                  <span>Order:</span>
+                  <input
+                    type="number"
+                    className="field w-14 py-1 text-xs text-center"
+                    value={item.order ?? i + 1}
+                    onChange={(e) => updateItem(i, 'order', Number(e.target.value))}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ManageSiteContent() {
   const [content, setContent] = useState(clone(defaults));
   const [loading, setLoading] = useState(true);
@@ -1515,6 +1846,7 @@ export default function ManageSiteContent() {
       icon: '🏠',
       items: [
         { id: 'home_hero', label: 'Hero Video & Ad Slider', icon: '🎬' },
+        { id: 'new_arrivals', label: 'New Product Arrivals', icon: '🌟', badge: 'Editable' },
         { id: 'engineer_trade', label: 'Engineer High Volume Trade', icon: '🚢', badge: 'New' },
         { id: 'home_offerings', label: 'What We Offer', icon: '📦' },
         { id: 'home_how_we_work', label: 'How We Work (3 Steps)', icon: '🔄' },
@@ -1637,6 +1969,27 @@ export default function ManageSiteContent() {
                 </p>
               </div>
               <ItemEditor section={content.homeHero} setSection={(v) => setSection('homeHero', v)} image video />
+            </section>
+          )}
+
+          {/* NEW PRODUCT ARRIVALS (EDITABLE) */}
+          {tab === 'new_arrivals' && (
+            <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+              <div className="border-b border-line pb-4 mb-5">
+                <span className="rounded-full bg-gold/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-ink">
+                  Seasonal Trade Arrivals
+                </span>
+                <h2 className="mt-2 font-display text-xl font-bold text-ink">
+                  New Product Arrivals Section
+                </h2>
+                <p className="mt-1 text-xs text-ink/60">
+                  Manage the auto-rotating homepage carousel, headlines, harvest year badge, timer, and featured export consignment cards.
+                </p>
+              </div>
+              <NewArrivalsEditor
+                section={content.newArrivals}
+                setSection={(v) => setSection('newArrivals', v)}
+              />
             </section>
           )}
 

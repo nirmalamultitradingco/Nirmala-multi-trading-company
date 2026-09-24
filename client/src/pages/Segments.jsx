@@ -53,11 +53,20 @@ export default function Segments() {
     setParams(next);
   };
 
-  const handleSearchSubmit = () => {
+  const handleSearchSubmit = (term) => {
+    const query = typeof term === 'string' ? term : search;
     const next = new URLSearchParams(params);
-    if (search.trim()) next.set('search', search.trim());
+    if (query && query.trim()) next.set('search', query.trim());
     else next.delete('search');
     setParams(next);
+    setSearch(''); // Requirement 1: Blank the search field
+  };
+
+  const handleClearSearch = () => {
+    const next = new URLSearchParams(params);
+    next.delete('search');
+    setParams(next);
+    setSearch('');
   };
 
   // Determine showcase items: use current category products or featured products
@@ -78,8 +87,10 @@ export default function Segments() {
         activeSegment={activeSegmentSlug}
         onSelectSegment={handleSelectSegment}
         search={search}
+        activeSearch={params.get('search') || ''}
         onSearchChange={setSearch}
         onSearchSubmit={handleSearchSubmit}
+        onClearSearch={handleClearSearch}
       />
 
       {/* 2. HERO SHOWCASE: CURVED FAN ARC OR 3D SPIN WHEEL */}
@@ -89,18 +100,34 @@ export default function Segments() {
         products={showcaseProducts}
       />
 
-      {/* 3. PRODUCT CARDS GRID (NO SECONDARY BAR BELOW SEGMENTS) */}
-      {loading ? (
-        <div className="py-20"><Loader /></div>
-      ) : productsData.products.length === 0 ? (
-        <div className="py-12">
-          <EmptyState
-            title={t('noMatch') || 'No products match your selection'}
-            hint={t('tryClear') || 'Try selecting a different category or clearing search.'}
-          />
+      {/* 3. PRODUCT CARDS GRID PROPERLY ALIGNED WITH SEGMENT */}
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-line/60 pb-4">
+          <div>
+            <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-gold">Export Segment</span>
+            <h2 className="mt-0.5 font-display text-2xl sm:text-3xl font-bold text-ink">
+              {activeSegmentObj ? activeSegmentObj.name : t('allProducts') || 'All Export Commodities'}
+            </h2>
+            <p className="text-xs sm:text-sm text-ink/65 mt-0.5 max-w-2xl">
+              {activeSegmentObj?.description || 'Browse our certified Sortex-cleaned export food commodities and farm cluster supplies.'}
+            </p>
+          </div>
+          <span className="shrink-0 font-mono text-xs font-semibold text-moss bg-forest/5 px-3 py-1.5 rounded-full border border-forest/15">
+            {productsData.total || productsData.products.length} Products Available
+          </span>
         </div>
-      ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
+        {loading ? (
+          <div className="py-20"><Loader /></div>
+        ) : productsData.products.length === 0 ? (
+          <div className="py-12">
+            <EmptyState
+              title={t('noMatch') || 'No products match your selection'}
+              hint={t('tryClear') || 'Try selecting a different category or clearing search.'}
+            />
+          </div>
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {/* First 3 products */}
           {productsData.products.slice(0, 3).map((p) => (
             <SplitProductCard key={p._id} product={p} />
@@ -118,7 +145,8 @@ export default function Segments() {
             <SplitProductCard key={p._id} product={p} />
           ))}
         </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

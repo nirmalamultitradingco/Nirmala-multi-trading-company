@@ -78,9 +78,18 @@ const DEFAULT_NEW_ARRIVALS = [
   },
 ];
 
-export default function NewArrivalsSlider({ products = [] }) {
+export default function NewArrivalsSlider({ products = [], config = null }) {
   const { t } = useLanguage();
-  const displayProducts = products.length > 0 ? products : DEFAULT_NEW_ARRIVALS;
+
+  // If admin provided arrival items, use them; otherwise fallback to dynamic products or defaults
+  const customItems = Array.isArray(config?.items)
+    ? config.items.filter((item) => item.isActive !== false)
+    : [];
+
+  const displayProducts = customItems.length > 0
+    ? customItems
+    : (products.length > 0 ? products : DEFAULT_NEW_ARRIVALS);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [visibleCount, setVisibleCount] = useState(4);
@@ -104,16 +113,21 @@ export default function NewArrivalsSlider({ products = [] }) {
   const total = displayProducts.length;
   const maxIndex = Math.max(0, total - visibleCount);
 
-  // Auto-rotating slider effect
+  // Auto-rotating slider effect with admin-defined or default duration
   useEffect(() => {
     if (total <= visibleCount || isHovered) return undefined;
 
+    const intervalSeconds = Number(config?.autoRotateSeconds);
+    const intervalMs = !isNaN(intervalSeconds) && intervalSeconds > 0
+      ? intervalSeconds * 1000
+      : 3800;
+
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
-    }, 3800);
+    }, intervalMs);
 
     return () => clearInterval(timer);
-  }, [total, visibleCount, maxIndex, isHovered]);
+  }, [total, visibleCount, maxIndex, isHovered, config?.autoRotateSeconds]);
 
   const prevSlide = () => {
     setCurrentIndex((prev) => (prev <= 0 ? maxIndex : prev - 1));
@@ -158,8 +172,9 @@ export default function NewArrivalsSlider({ products = [] }) {
           }}
         >
           {displayProducts.map((product) => {
-            const detailUrl = `/product-details/${product.slug}`;
-            const segmentName = product.segment?.name || 'Agro Commodity';
+            const detailUrl = product.slug ? `/product-details/${product.slug}` : '/products';
+            const segmentName = product.categoryName || product.segment?.name || 'Agro Commodity';
+            const badgeText = product.badge || config?.badge || t('newArrival') || '✨ New Arrival';
             const imgSrc = product.image
               ? product.image.startsWith('http')
                 ? product.image
@@ -168,7 +183,7 @@ export default function NewArrivalsSlider({ products = [] }) {
 
             return (
               <div
-                key={product._id}
+                key={product._id || product.slug || product.name}
                 className="shrink-0 px-3 transition-all duration-300"
                 style={{ width: `${cardWidthPercent}%` }}
               >
@@ -194,7 +209,7 @@ export default function NewArrivalsSlider({ products = [] }) {
                     {/* "New Arrival" Gold Badge */}
                     <div className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-forest/90 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-gold shadow-md backdrop-blur border border-gold/40">
                       <span className="h-1.5 w-1.5 rounded-full bg-gold animate-ping" />
-                      <span>{t('newArrival') || '✨ New Arrival'}</span>
+                      <span>{badgeText}</span>
                     </div>
 
                     {/* Origin Tag */}

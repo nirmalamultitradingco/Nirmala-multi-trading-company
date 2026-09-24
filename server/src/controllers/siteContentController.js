@@ -36,6 +36,12 @@ const getOrCreate = async () => {
     modified = true;
   }
 
+  if (!content.newArrivals || !content.newArrivals.title) {
+    const fresh = new SiteContent();
+    content.newArrivals = fresh.newArrivals;
+    modified = true;
+  }
+
   if (modified) {
     await content.save();
   }
@@ -63,6 +69,7 @@ export const updateSiteContent = asyncHandler(async (req, res) => {
     'engineerTrade',
     'flashCard',
     'chatbot',
+    'newArrivals',
   ];
   const update = {};
 

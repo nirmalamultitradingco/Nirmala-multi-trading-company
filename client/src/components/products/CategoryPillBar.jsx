@@ -6,8 +6,10 @@ export default function CategoryPillBar({
   activeSegment = '',
   onSelectSegment,
   search = '',
+  activeSearch = '',
   onSearchChange,
   onSearchSubmit,
+  onClearSearch,
 }) {
   const { t } = useLanguage();
   const navRef = useRef(null);
@@ -21,15 +23,23 @@ export default function CategoryPillBar({
     }
   };
 
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    if (onSearchSubmit) {
+      onSearchSubmit(search);
+    }
+    // Requirement 1: Blank the search field when search button is clicked
+    if (onSearchChange) {
+      onSearchChange('');
+    }
+  };
+
   return (
     <div className="w-full space-y-4">
-      {/* Search Bar */}
+      {/* Search Bar - Cleanly aligned and auto-clears on submit */}
       <div className="mx-auto max-w-xl">
         <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (onSearchSubmit) onSearchSubmit();
-          }}
+          onSubmit={handleFormSubmit}
           className="relative flex items-center shadow-sm"
         >
           <span className="pointer-events-none absolute left-4 text-ink/40 text-base" aria-hidden="true">
@@ -38,28 +48,47 @@ export default function CategoryPillBar({
           <input
             type="text"
             value={search}
-            onChange={(e) => onSearchChange(e.target.value)}
+            onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
             placeholder={t('searchProducts') || 'Search products, spices, origins, HS codes…'}
             className="w-full rounded-full border border-line/80 bg-white/95 py-3 pl-11 pr-24 text-sm font-medium text-ink shadow-sm backdrop-blur outline-none transition focus:border-forest focus:bg-white focus:ring-4 focus:ring-forest/10"
           />
           {search && (
             <button
               type="button"
-              onClick={() => onSearchChange('')}
-              className="absolute right-16 text-xs text-ink/40 hover:text-ink p-1"
-              aria-label={t('clear') || 'Clear search'}
+              onClick={() => onSearchChange && onSearchChange('')}
+              className="absolute right-20 text-xs text-ink/40 hover:text-ink p-1"
+              aria-label={t('clear') || 'Clear input'}
             >
               ✕
             </button>
           )}
           <button
             type="submit"
-            className="absolute right-1.5 rounded-full bg-forest px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-forest/90"
+            className="absolute right-1.5 rounded-full bg-forest px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-forest/90 active:scale-95"
           >
             {t('search') || 'Search'}
           </button>
         </form>
       </div>
+
+      {/* Active Search Indicator Chip */}
+      {activeSearch && (
+        <div className="mx-auto flex max-w-xl items-center justify-between rounded-full border border-gold/40 bg-[#faf8f3] px-4 py-1.5 text-xs text-ink shadow-xs">
+          <div className="flex items-center gap-1.5">
+            <span className="font-bold text-forest">Filtered by:</span>
+            <span className="font-semibold text-gold">"{activeSearch}"</span>
+          </div>
+          {onClearSearch && (
+            <button
+              type="button"
+              onClick={onClearSearch}
+              className="text-xs font-bold text-clay hover:underline flex items-center gap-1"
+            >
+              <span>✕</span> Clear Search
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Floating Capsule Pill Bar (Slide bar hidden with smooth controls) */}
       <div className="relative mx-auto flex max-w-5xl items-center justify-center px-1">

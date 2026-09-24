@@ -13,6 +13,26 @@ export default function Layout() {
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+
+    // Auto-focus first editable field when navigating to any form page
+    const isFormPage =
+      pathname.includes('inquiry') ||
+      pathname.includes('partner') ||
+      pathname.includes('contact') ||
+      pathname.includes('login') ||
+      pathname.includes('register');
+
+    if (isFormPage) {
+      const timer = setTimeout(() => {
+        const firstField = document.querySelector(
+          'main form input:not([type=hidden]):not([disabled]), main form textarea:not([disabled]), main form select:not([disabled])'
+        );
+        if (firstField && document.activeElement !== firstField) {
+          firstField.focus();
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
   }, [pathname]);
 
   return (

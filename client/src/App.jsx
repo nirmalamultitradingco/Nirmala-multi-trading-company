@@ -59,10 +59,16 @@ export default function App() {
         <Route path="products" element={<Segments />} />
         <Route path="products/:slug/:subsegmentSlug" element={<SegmentDetail />} />
         <Route path="products/:slug" element={<SegmentDetail />} />
+        <Route path="products/category/:slug" element={<SegmentDetail />} />
+        <Route path="category/:slug" element={<SegmentDetail />} />
+        <Route path="categories" element={<Navigate to="/products" replace />} />
 
-        {/* Product Details (catalogue & single product) */}
+        {/* Product Details (catalogue & single product with dynamic aliases) */}
         <Route path="product-details" element={<Products />} />
         <Route path="product-details/:slug" element={<ProductDetail />} />
+        <Route path="product/:slug" element={<ProductDetail />} />
+        <Route path="products/item/:slug" element={<ProductDetail />} />
+        <Route path="products/detail/:slug" element={<ProductDetail />} />
 
         {/* Blog */}
         <Route path="blog" element={<News />} />
@@ -81,6 +87,7 @@ export default function App() {
         <Route path="brochures" element={<Brochures />} />
         <Route path="about" element={<About />} />
         <Route path="inquiry" element={<Inquiry />} />
+        <Route path="inquiry/:productSlug" element={<Inquiry />} />
       </Route>
 
       {/* Admin */}

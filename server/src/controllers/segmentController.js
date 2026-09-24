@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Segment from '../models/Segment.js';
 import Product from '../models/Product.js';
 import SubSegment from '../models/SubSegment.js';
@@ -31,7 +32,13 @@ export const getSegments = asyncHandler(async (req, res) => {
 });
 
 export const getSegmentBySlug = asyncHandler(async (req, res) => {
-  const segment = await Segment.findOne({ slug: req.params.slug });
+  const param = req.params.slug;
+  const isId = mongoose.Types.ObjectId.isValid(param);
+  const query = isId
+    ? { $or: [{ _id: param }, { slug: param }] }
+    : { slug: param };
+
+  const segment = await Segment.findOne(query);
   if (!segment) { res.status(404); throw new Error('Segment not found.'); }
 
   const subsegments = await SubSegment.find({ segment: segment._id, isActive: true }).sort({ order: 1, name: 1 });

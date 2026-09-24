@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/axios.js';
 import { BRAND } from '../config.js';
@@ -35,6 +35,15 @@ export default function BecomePartner() {
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', text: '' });
   const [submitted, setSubmitted] = useState(false);
+  const companyInputRef = useRef(null);
+
+  useEffect(() => {
+    // Focus cursor in first field on page load
+    const timer = setTimeout(() => {
+      companyInputRef.current?.focus();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const toggleCategory = (cat) => {
     setForm((prev) => {
@@ -198,6 +207,8 @@ export default function BecomePartner() {
                     </label>
                     <input
                       type="text"
+                      ref={companyInputRef}
+                      autoFocus
                       required
                       placeholder="e.g. Gujarat Organic Spice Mills Pvt Ltd"
                       className="field"

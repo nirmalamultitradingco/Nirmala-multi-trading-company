@@ -488,6 +488,7 @@ Website: https://nirmalamultitrading.com`;
                 <label className="label text-xs">Email Subject Line</label>
                 <input
                   type="text"
+                  autoFocus
                   className="field text-xs font-semibold"
                   value={replySubject}
                   onChange={(e) => setReplySubject(e.target.value)}

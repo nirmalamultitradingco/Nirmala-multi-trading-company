@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api/axios.js';
 import { BRAND } from '../config.js';
@@ -15,6 +15,15 @@ export default function Inquiry() {
   const [segments, setSegments] = useState([]);
   const [products, setProducts] = useState([]);
   const [status, setStatus] = useState({ state: 'idle', message: '' });
+  const nameInputRef = useRef(null);
+
+  useEffect(() => {
+    // Focus first input field when arriving at inquiry form
+    const focusTimer = setTimeout(() => {
+      nameInputRef.current?.focus();
+    }, 100);
+    return () => clearTimeout(focusTimer);
+  }, []);
   const [hero, setHero] = useState({
     eyebrow: 'Get in touch',
     title: "We're ready to talk.",
@@ -127,7 +136,16 @@ export default function Inquiry() {
           <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="label" htmlFor="name">{t('name')} *</label>
-              <input id="name" name="name" className="field" required value={form.name} onChange={update} />
+              <input
+                id="name"
+                name="name"
+                ref={nameInputRef}
+                autoFocus
+                className="field"
+                required
+                value={form.name}
+                onChange={update}
+              />
             </div>
             <div>
               <label className="label" htmlFor="email">{t('email')} *</label>

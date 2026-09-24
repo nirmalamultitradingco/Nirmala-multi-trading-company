@@ -55,6 +55,7 @@ export default function Home() {
         const newArrivals = Array.isArray(prodLatest?.data?.products) ? prodLatest.data.products : [];
         const partners = Array.isArray(part?.data) ? part.data : [];
         const engineerTrade = content?.data?.engineerTrade || null;
+        const newArrivalsContent = content?.data?.newArrivals || null;
 
         setData({
           segments,
@@ -62,6 +63,7 @@ export default function Home() {
           newArrivals,
           partners,
           engineerTrade,
+          newArrivalsContent,
         });
       } catch (error) {
         console.error('Home page API error:', error);
@@ -74,6 +76,7 @@ export default function Home() {
           newArrivals: [],
           partners: [],
           engineerTrade: null,
+          newArrivalsContent: null,
         });
       } finally {
         if (mounted) {
@@ -140,22 +143,34 @@ export default function Home() {
           )}
 
           {/* 3. NEW PRODUCT ARRIVALS (AUTO-ROTATING CAROUSEL SLIDE) */}
-          <section className="container-x py-12 md:py-16 home-reveal-section border-t border-line/60">
-            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end home-reveal">
-              <SectionHeading
-                eyebrow="Fresh Season Harvest"
-                title="New product arrivals"
-              />
-              <Link
-                to="/products"
-                className="text-sm font-semibold text-forest hover:text-ink transition hover:underline"
-              >
-                Browse all categories →
-              </Link>
-            </div>
+          {(!data.newArrivalsContent || data.newArrivalsContent.isActive !== false) && (
+            <section className="container-x py-12 md:py-16 home-reveal-section border-t border-line/60">
+              <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end home-reveal">
+                <div>
+                  <SectionHeading
+                    eyebrow={data.newArrivalsContent?.eyebrow || 'Fresh Season Harvest'}
+                    title={data.newArrivalsContent?.title || 'New product arrivals'}
+                  />
+                  {data.newArrivalsContent?.description && (
+                    <p className="mt-2 text-sm text-ink/70 max-w-2xl">
+                      {data.newArrivalsContent.description}
+                    </p>
+                  )}
+                </div>
+                <Link
+                  to="/products"
+                  className="text-sm font-semibold text-forest hover:text-ink transition hover:underline"
+                >
+                  Browse all categories →
+                </Link>
+              </div>
 
-            <NewArrivalsSlider products={data.newArrivals} />
-          </section>
+              <NewArrivalsSlider
+                config={data.newArrivalsContent}
+                products={data.newArrivals}
+              />
+            </section>
+          )}
 
           {/* 4. EXPLORE OUR PRODUCTS (AUTO-ROTATING CAROUSEL) */}
           {data.segments.length > 0 && (
