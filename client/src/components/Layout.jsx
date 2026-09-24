@@ -6,6 +6,7 @@ import CustomCursor from './CustomCursor.jsx';
 import FirstVisitLoader from './FirstVisitLoader.jsx';
 import FlashCardModal from './FlashCardModal.jsx';
 import ScrollToTop from './ScrollToTop.jsx';
+import TradeMitraChatbot from './TradeMitraChatbot.jsx';
 
 export default function Layout() {
   const { pathname } = useLocation();
@@ -27,6 +28,8 @@ export default function Layout() {
 
       <Footer />
       <ScrollToTop />
+      <TradeMitraChatbot />
     </div>
   );
 }
+

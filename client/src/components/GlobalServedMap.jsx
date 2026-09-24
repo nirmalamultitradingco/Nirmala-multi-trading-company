@@ -260,46 +260,197 @@ export default function GlobalServedMap() {
                 <line x1="750" y1="0" x2="750" y2="500" />
               </g>
 
-              {/* Continents Vector Landmass Paths */}
-              <g fill="#1A3326" stroke="#254836" strokeWidth="0.75" className="transition-colors duration-500">
-                {/* North America */}
-                <path d="M 120 70 Q 180 50 250 65 Q 290 90 280 140 Q 260 170 240 210 Q 210 230 190 250 L 170 230 Q 150 180 130 150 Q 90 120 120 70 Z" />
-                {/* Canada & Alaska Extension */}
-                <path d="M 80 80 Q 130 40 220 40 Q 270 50 310 70 L 290 100 Q 220 80 160 90 Z" />
-                {/* Greenland */}
-                <path d="M 340 40 Q 380 30 410 45 Q 400 90 370 95 Q 340 80 340 40 Z" opacity="0.6" />
-                {/* South America */}
-                <path d="M 230 270 Q 270 270 300 310 Q 320 370 290 430 Q 260 470 240 440 Q 230 360 215 320 Z" />
-                {/* Europe */}
-                <path d="M 470 90 Q 520 85 570 105 Q 560 150 520 160 Q 480 160 465 140 Q 460 110 470 90 Z" />
-                {/* Scandinavia & Norway */}
-                <path d="M 505 50 Q 535 45 545 70 Q 540 105 520 110 Q 500 90 505 50 Z" />
-                {/* United Kingdom & Ireland */}
-                <path d="M 475 95 Q 492 90 495 112 Q 485 125 470 120 Z" />
-                {/* Africa */}
-                <path d="M 470 170 Q 540 165 570 210 Q 590 270 560 350 Q 530 400 500 390 Q 460 340 450 260 Q 440 200 470 170 Z" />
-                {/* Asia Mainland */}
-                <path d="M 570 95 Q 670 70 820 85 Q 920 110 930 180 Q 900 240 850 260 Q 820 220 780 230 Q 730 200 680 200 Q 640 180 580 160 Z" />
-                {/* Indian Subcontinent (Highlighted as Export Source Gateway) */}
-                <path
-                  d="M 670 190 Q 720 190 735 220 Q 725 270 700 290 Q 675 260 665 220 Z"
-                  fill="#234E37"
-                  stroke="#C6912E"
-                  strokeWidth="1.2"
-                />
-                {/* Arabian Peninsula / GCC */}
-                <path
-                  d="M 590 190 Q 645 180 660 210 Q 650 250 615 250 Q 580 240 590 190 Z"
-                  fill={selectedId === 'gcc' || hoveredId === 'gcc' ? '#2A553E' : '#1A3326'}
-                  stroke={selectedId === 'gcc' || hoveredId === 'gcc' ? '#C6912E' : '#254836'}
-                  strokeWidth={selectedId === 'gcc' || hoveredId === 'gcc' ? '1.5' : '0.75'}
-                />
-                {/* Southeast Asia Islands & Peninsulas */}
-                <path d="M 770 245 Q 820 245 840 280 Q 830 320 790 320 Q 760 280 770 245 Z" />
-                {/* Japan Archipelago */}
-                <path d="M 885 130 Q 910 145 905 175 Q 890 180 880 155 Z" />
-                {/* Australia */}
-                <path d="M 810 330 Q 890 320 910 365 Q 890 420 830 420 Q 780 390 810 330 Z" opacity="0.65" />
+              {/* Continents & Countries Vector Landmass Paths */}
+              <g className="transition-colors duration-500">
+                {/* Global World Landmass Background Outline */}
+                <g fill="#152b20" stroke="#224231" strokeWidth="0.65" opacity="0.6">
+                  {/* Canada & Alaska Northern Terr */}
+                  <path d="M 80 75 Q 120 40 180 35 Q 230 35 285 50 Q 320 65 310 95 L 285 105 Q 240 90 190 95 Q 140 100 110 85 Z" />
+                  {/* Greenland */}
+                  <path d="M 335 35 Q 375 25 405 40 Q 395 85 365 90 Q 335 75 335 35 Z" opacity="0.4" />
+                  {/* South America */}
+                  <path d="M 230 265 Q 275 260 305 300 Q 325 360 295 425 Q 265 465 245 435 Q 225 355 210 315 Q 205 285 230 265 Z" />
+                  {/* Africa */}
+                  <path d="M 465 170 Q 535 165 565 205 Q 585 265 555 345 Q 525 395 495 385 Q 455 335 445 255 Q 435 195 465 170 Z" />
+                  {/* Australia */}
+                  <path d="M 810 330 Q 885 320 905 360 Q 885 415 825 415 Q 775 385 810 330 Z" opacity="0.5" />
+                </g>
+
+                {/* 1. UNITED STATES OF AMERICA (Proper 48 States, Florida, Texas Gulf, East & West Coasts) */}
+                <g
+                  onClick={() => setSelectedId('usa')}
+                  onMouseEnter={() => setHoveredId('usa')}
+                  onMouseLeave={() => setHoveredId(null)}
+                  className="cursor-pointer transition-all duration-300"
+                >
+                  {/* Continental US 48 States */}
+                  <path
+                    d="M 136 122 L 170 122 L 205 122 Q 214 128 224 124 Q 232 130 242 124 L 252 116 L 254 126 L 246 134 L 242 144 L 238 156 L 234 170 L 230 182 L 233 196 L 234 214 Q 230 220 226 216 L 224 198 L 214 198 L 204 204 L 194 208 L 186 212 L 174 196 L 158 196 L 150 190 L 146 178 L 142 160 L 138 140 Z"
+                    fill={selectedId === 'usa' || hoveredId === 'usa' ? '#2e6345' : '#1b3829'}
+                    stroke={selectedId === 'usa' || hoveredId === 'usa' ? '#C6912E' : '#2d5c41'}
+                    strokeWidth={selectedId === 'usa' || hoveredId === 'usa' ? '1.6' : '0.9'}
+                  />
+                  {/* Alaska & Hawaii */}
+                  <path
+                    d="M 85 70 Q 110 65 118 80 Q 105 92 88 88 Z"
+                    fill={selectedId === 'usa' || hoveredId === 'usa' ? '#2e6345' : '#1b3829'}
+                    stroke={selectedId === 'usa' || hoveredId === 'usa' ? '#C6912E' : '#2d5c41'}
+                    strokeWidth="0.6"
+                  />
+                  <circle cx="118" cy="225" r="2.5" fill="#C6912E" opacity="0.8" />
+                  <circle cx="123" cy="227" r="2" fill="#C6912E" opacity="0.8" />
+                  {/* Country Name Tag */}
+                  <text x="185" y="165" fill="#F7F4EC" fontSize="9" fontWeight="700" opacity="0.85" textAnchor="middle" pointerEvents="none">
+                    USA
+                  </text>
+                </g>
+
+                {/* 2. UNITED KINGDOM & IRELAND (Authentic British Isles Contours) */}
+                <g
+                  onClick={() => setSelectedId('uk')}
+                  onMouseEnter={() => setHoveredId('uk')}
+                  onMouseLeave={() => setHoveredId(null)}
+                  className="cursor-pointer transition-all duration-300"
+                >
+                  {/* Great Britain (Scotland, England, Wales) */}
+                  <path
+                    d="M 484 82 Q 492 78 496 86 L 493 96 L 498 104 L 502 114 L 498 124 L 488 128 L 476 130 L 474 122 L 478 114 L 482 108 L 480 96 Z"
+                    fill={selectedId === 'uk' || hoveredId === 'uk' ? '#2e6345' : '#1b3829'}
+                    stroke={selectedId === 'uk' || hoveredId === 'uk' ? '#C6912E' : '#2d5c41'}
+                    strokeWidth={selectedId === 'uk' || hoveredId === 'uk' ? '1.6' : '0.9'}
+                  />
+                  {/* Ireland Island */}
+                  <path
+                    d="M 464 104 Q 472 102 473 112 Q 470 124 464 122 Q 460 114 464 104 Z"
+                    fill={selectedId === 'uk' || hoveredId === 'uk' ? '#2e6345' : '#1b3829'}
+                    stroke={selectedId === 'uk' || hoveredId === 'uk' ? '#C6912E' : '#2d5c41'}
+                    strokeWidth="0.7"
+                  />
+                  <text x="490" y="140" fill="#F7F4EC" fontSize="8" fontWeight="700" opacity="0.85" textAnchor="middle" pointerEvents="none">
+                    UK
+                  </text>
+                </g>
+
+                {/* 3. SCANDINAVIA & NORWAY (Norwegian Fjords & Scandinavian Peninsula) */}
+                <g
+                  onClick={() => setSelectedId('norway')}
+                  onMouseEnter={() => setHoveredId('norway')}
+                  onMouseLeave={() => setHoveredId(null)}
+                  className="cursor-pointer transition-all duration-300"
+                >
+                  <path
+                    d="M 518 48 Q 532 38 546 40 Q 552 54 544 74 Q 538 92 528 98 L 520 86 Q 514 70 518 48 Z"
+                    fill={selectedId === 'norway' || hoveredId === 'norway' ? '#2e6345' : '#1b3829'}
+                    stroke={selectedId === 'norway' || hoveredId === 'norway' ? '#C6912E' : '#2d5c41'}
+                    strokeWidth={selectedId === 'norway' || hoveredId === 'norway' ? '1.6' : '0.9'}
+                  />
+                  <text x="532" y="68" fill="#F7F4EC" fontSize="8" fontWeight="700" opacity="0.85" textAnchor="middle" pointerEvents="none">
+                    Norway
+                  </text>
+                </g>
+
+                {/* 4. EUROPEAN UNION (Iberia, France, Germany, Italian Boot & Low Countries) */}
+                <g
+                  onClick={() => setSelectedId('europe')}
+                  onMouseEnter={() => setHoveredId('europe')}
+                  onMouseLeave={() => setHoveredId(null)}
+                  className="cursor-pointer transition-all duration-300"
+                >
+                  {/* Western, Southern & Central Europe */}
+                  <path
+                    d="M 454 168 L 468 176 L 484 168 L 486 150 L 472 148 L 476 138 L 492 128 L 504 120 L 518 116 L 536 116 L 556 122 L 552 140 L 538 144 L 544 162 L 534 178 L 526 186 L 522 170 L 514 156 L 498 146 L 486 150 Z"
+                    fill={selectedId === 'europe' || hoveredId === 'europe' ? '#2e6345' : '#1b3829'}
+                    stroke={selectedId === 'europe' || hoveredId === 'europe' ? '#C6912E' : '#2d5c41'}
+                    strokeWidth={selectedId === 'europe' || hoveredId === 'europe' ? '1.6' : '0.9'}
+                  />
+                  {/* Sicily */}
+                  <path
+                    d="M 528 192 Q 534 190 534 196 Q 528 198 528 192 Z"
+                    fill={selectedId === 'europe' || hoveredId === 'europe' ? '#2e6345' : '#1b3829'}
+                    stroke={selectedId === 'europe' || hoveredId === 'europe' ? '#C6912E' : '#2d5c41'}
+                    strokeWidth="0.6"
+                  />
+                  <text x="518" y="145" fill="#F7F4EC" fontSize="8.5" fontWeight="700" opacity="0.85" textAnchor="middle" pointerEvents="none">
+                    Europe
+                  </text>
+                </g>
+
+                {/* 5. GCC & ARABIAN PENINSULA (Saudi Arabia, UAE/Dubai, Qatar, Oman) */}
+                <g
+                  onClick={() => setSelectedId('gcc')}
+                  onMouseEnter={() => setHoveredId('gcc')}
+                  onMouseLeave={() => setHoveredId(null)}
+                  className="cursor-pointer transition-all duration-300"
+                >
+                  <path
+                    d="M 596 188 L 602 214 L 608 238 L 614 250 L 630 242 L 642 232 L 648 218 L 638 212 L 634 204 L 626 195 L 616 188 Z"
+                    fill={selectedId === 'gcc' || hoveredId === 'gcc' ? '#2e6345' : '#1b3829'}
+                    stroke={selectedId === 'gcc' || hoveredId === 'gcc' ? '#C6912E' : '#2d5c41'}
+                    strokeWidth={selectedId === 'gcc' || hoveredId === 'gcc' ? '1.6' : '0.9'}
+                  />
+                  <text x="622" y="222" fill="#F7F4EC" fontSize="8.5" fontWeight="700" opacity="0.85" textAnchor="middle" pointerEvents="none">
+                    GCC
+                  </text>
+                </g>
+
+                {/* 6. INDIAN SUBCONTINENT (ORIGIN: Proper Kashmir Crown, Gujarat Peninsula/Mundra, South Cape, Bengal Delta) */}
+                <g className="cursor-pointer">
+                  <path
+                    d="M 698 152 Q 706 148 712 155 Q 716 166 714 176 L 722 186 L 738 189 L 742 184 L 745 190 L 758 186 L 772 184 L 774 195 L 766 200 L 755 198 L 748 208 L 744 218 L 734 228 L 726 242 L 716 262 L 706 282 L 698 302 L 692 288 L 688 272 L 684 256 L 680 242 L 678 232 L 676 226 L 666 226 L 658 222 L 660 214 L 668 210 L 662 202 L 672 192 L 680 180 L 688 170 Z"
+                    fill="#234E37"
+                    stroke="#C6912E"
+                    strokeWidth="2.2"
+                    filter="url(#glow)"
+                  />
+                  {/* Sri Lanka */}
+                  <path d="M 703 306 Q 708 304 708 312 Q 705 316 701 313 Z" fill="#234E37" stroke="#C6912E" strokeWidth="0.8" />
+                  {/* Mundra & JNPT Origin Port Pins */}
+                  <circle cx="664" cy="216" r="3" fill="#F5D061" stroke="#234E37" strokeWidth="1" />
+                  <circle cx="678" cy="236" r="3" fill="#F5D061" stroke="#234E37" strokeWidth="1" />
+                  <text x="704" y="235" fill="#F5D061" fontSize="10" fontWeight="800" textAnchor="middle" pointerEvents="none" filter="url(#glow)">
+                    INDIA (Origin)
+                  </text>
+                </g>
+
+                {/* 7. ASIAN MARKETS (Southeast Asia, Malay Peninsula, Singapore, East Asia & Japan Archipelago) */}
+                <g
+                  onClick={() => setSelectedId('asia')}
+                  onMouseEnter={() => setHoveredId('asia')}
+                  onMouseLeave={() => setHoveredId(null)}
+                  className="cursor-pointer transition-all duration-300"
+                >
+                  {/* Mainland China & East Asia Coast */}
+                  <path
+                    d="M 748 136 Q 815 125 842 152 Q 852 180 832 202 Q 815 220 788 234 L 778 218 Q 755 178 748 136 Z"
+                    fill={selectedId === 'asia' || hoveredId === 'asia' ? '#2e6345' : '#1b3829'}
+                    stroke={selectedId === 'asia' || hoveredId === 'asia' ? '#C6912E' : '#2d5c41'}
+                    strokeWidth={selectedId === 'asia' || hoveredId === 'asia' ? '1.5' : '0.8'}
+                  />
+                  {/* Southeast Asia & Malay Peninsula down to Singapore */}
+                  <path
+                    d="M 784 238 L 794 252 L 793 274 L 787 272 L 780 256 L 782 242 Z"
+                    fill={selectedId === 'asia' || hoveredId === 'asia' ? '#2e6345' : '#1b3829'}
+                    stroke={selectedId === 'asia' || hoveredId === 'asia' ? '#C6912E' : '#2d5c41'}
+                    strokeWidth="1.2"
+                  />
+                  {/* Japan Archipelago (Honshu, Hokkaido, Kyushu) */}
+                  <path
+                    d="M 880 134 Q 896 140 894 162 Q 884 175 874 160 Z"
+                    fill={selectedId === 'asia' || hoveredId === 'asia' ? '#2e6345' : '#1b3829'}
+                    stroke={selectedId === 'asia' || hoveredId === 'asia' ? '#C6912E' : '#2d5c41'}
+                    strokeWidth="0.9"
+                  />
+                  {/* Indonesian & Philippines Islands */}
+                  <path
+                    d="M 798 288 Q 838 288 854 314 Q 828 320 794 304 Z"
+                    fill={selectedId === 'asia' || hoveredId === 'asia' ? '#2e6345' : '#1b3829'}
+                    stroke={selectedId === 'asia' || hoveredId === 'asia' ? '#C6912E' : '#2d5c41'}
+                    strokeWidth="0.7"
+                  />
+                  <text x="815" y="195" fill="#F7F4EC" fontSize="8.5" fontWeight="700" opacity="0.85" textAnchor="middle" pointerEvents="none">
+                    Asia
+                  </text>
+                </g>
               </g>
 
               {/* Trade Route Arc Connections from India to Destinations */}

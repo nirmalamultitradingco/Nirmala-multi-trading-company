@@ -69,6 +69,19 @@ const certificateSchema = new mongoose.Schema(
   { _id: true }
 );
 
+const tradePillarSchema = new mongoose.Schema(
+  {
+    title: { type: String, default: '' },
+    subtitle: { type: String, default: '' },
+    metric: { type: String, default: '' },
+    description: { type: String, default: '' },
+    icon: { type: String, default: '🚢' },
+    order: { type: Number, default: 0 },
+    isActive: { type: Boolean, default: true },
+  },
+  { _id: true }
+);
+
 const siteContentSchema = new mongoose.Schema(
   {
     key: { type: String, unique: true, index: true, default: 'main' },
@@ -244,6 +257,61 @@ const siteContentSchema = new mongoose.Schema(
         ],
       },
     },
+    engineerTrade: {
+      eyebrow: { type: String, default: 'Industrial & Large-Scale Operations' },
+      title: { type: String, default: 'Engineering High-Volume Global Trade' },
+      description: {
+        type: String,
+        default:
+          'Scalable processing, precision container consolidation, and institutional supply chain reliability from farm gate to global port.',
+      },
+      badge: { type: String, default: 'FCL & Multi-Container Consignments' },
+      items: {
+        type: [tradePillarSchema],
+        default: [
+          {
+            title: 'Sortex Cleaning & Optical Grading',
+            metric: '99.9% Purity',
+            subtitle: 'Zero foreign matter tolerance',
+            description:
+              'Advanced optical Buhler color sorters and gravity separators ensuring clean, uniform export-grade spices and oil seeds.',
+            icon: '🔍',
+            order: 1,
+            isActive: true,
+          },
+          {
+            title: 'Multi-Commodity FCL Consolidation',
+            metric: '500+ TEU / yr',
+            subtitle: 'Mundra & JNPT Port hubs',
+            description:
+              'Stuffing multiple distinct agricultural products into single 20ft/40ft ocean containers to optimize buyer inventory turnover.',
+            icon: '🚢',
+            order: 2,
+            isActive: true,
+          },
+          {
+            title: 'MRL & Phytosanitary Lab Clearance',
+            metric: 'Zero-Rejection',
+            subtitle: 'Certified export compliance',
+            description:
+              'Comprehensive pre-shipment tests for pesticide residue, aflatoxin, heavy metals, and moisture clearance before sailing.',
+            icon: '📋',
+            order: 3,
+            isActive: true,
+          },
+          {
+            title: 'Institutional Bulk & Private Label',
+            metric: 'Custom Pack',
+            subtitle: 'Tailored for retail & food service',
+            description:
+              'From 25kg / 50kg multi-wall paper and PP bags to high-barrier nitrogen-flushed retail standup pouches with buyer branding.',
+            icon: '📦',
+            order: 4,
+            isActive: true,
+          },
+        ],
+      },
+    },
     flashCard: {
       isActive: { type: Boolean, default: true },
       title: { type: String, default: 'India’s Taste. The World’s Table' },
@@ -251,6 +319,120 @@ const siteContentSchema = new mongoose.Schema(
       image: { type: String, default: '' },
       buttonText: { type: String, default: 'Explore Our Products' },
       buttonLink: { type: String, default: '/products' },
+    },
+    chatbot: {
+      botName: { type: String, default: 'TradeMitra' },
+      botSubtitle: { type: String, default: 'AI Export & Sourcing Assistant' },
+      welcomeMessage: {
+        type: String,
+        default:
+          'Hello! I am **TradeMitra**, your export & sourcing assistant at **Nirmala Multi Trading Co.** (NMC).\n\nHow can I assist your food import or procurement inquiry today?',
+      },
+      defaultSuggestions: {
+        type: [String],
+        default: [
+          'What spices do you export?',
+          'Shipping to USA, Europe & GCC',
+          'Can I request sample kits?',
+          'Certificates & Quality',
+        ],
+      },
+      disclaimer: {
+        type: String,
+        default:
+          'Responses are generated based on NMC product catalogues and export shipping specifications.',
+      },
+      isActive: { type: Boolean, default: true },
+      knowledgeBase: {
+        type: [
+          new mongoose.Schema(
+            {
+              triggers: { type: [String], default: [] },
+              reply: { type: String, default: '' },
+              link: { type: String, default: '' },
+              linkText: { type: String, default: '' },
+              suggestions: { type: [String], default: [] },
+              order: { type: Number, default: 0 },
+              isActive: { type: Boolean, default: true },
+            },
+            { _id: true }
+          ),
+        ],
+        default: [
+          {
+            triggers: ['spice', 'spices', 'cumin', 'turmeric', 'chilli', 'coriander', 'fenugreek', 'fennel', 'mustard', 'pepper'],
+            reply: 'We export 100% Sortex-cleaned, premium Indian spices directly from farm clusters in Gujarat and Rajasthan: Cumin Seeds (Singapore 99%, Europe 99.5% Sortex), Turmeric (High Curcumin 3-5%), Red Chilli (Teja, Sanman, Byadgi), and Coriander seeds. Steam-sterilized and pesticide compliant.',
+            link: '/products',
+            linkText: 'Browse All Products →',
+            suggestions: ['What is your MOQ?', 'Request sample kit', 'Lab certifications'],
+            order: 1,
+            isActive: true,
+          },
+          {
+            triggers: ['grain', 'grains', 'rice', 'basmati', 'wheat', 'pulse', 'pulses', 'dal', 'chickpea', 'lentil'],
+            reply: 'We supply high-grade Indian agricultural grains and pulses in bulk and retail packs: Basmati Rice (1121 Steam, Sella & Golden Sella 8.35mm+), Non-Basmati (Sona Masoori, PR-11, IR-64), and Pulses (Kabuli Chickpeas 75/80, 58/60, Toor Dal, Moong).',
+            link: '/products',
+            linkText: 'Explore Grain & Rice Catalogue →',
+            suggestions: ['What is your MOQ?', 'Shipping transit time', 'Request pricing'],
+            order: 2,
+            isActive: true,
+          },
+          {
+            triggers: ['dehydrate', 'dehydrated', 'onion', 'garlic', 'flake', 'powder'],
+            reply: 'NMC sources premium dehydrated vegetables from Mahuva, Gujarat: Dehydrated White & Red Onion (Flakes, Minced, Chopped, Powder) and Dehydrated Garlic (Cloves, Flakes, Minced, Pure Powder). Moisture < 6% with zero Salmonella/E. Coli.',
+            link: '/products',
+            linkText: 'View Dehydrated Products →',
+            suggestions: ['Ask for quotation', 'Request sample kit'],
+            order: 3,
+            isActive: true,
+          },
+          {
+            triggers: ['port', 'ports', 'shipping', 'transit', 'logistics', 'container', 'fcl', 'lcl', 'freight', 'mundra', 'jnpt'],
+            reply: 'We handle smooth containerized logistics from Mundra Port (Gujarat) & Nhava Sheva (JNPT, Mumbai). Transit times: GCC 3-7 days, Asia 6-14 days, UK 20-25 days, Europe 18-24 days, USA 22-28 days. Available in FCL and LCL under FOB, CIF, CFR, or DDP terms.',
+            link: '/inquiry',
+            linkText: 'Get Container Freight Quote →',
+            suggestions: ['How to request samples?', 'Pesticide & Lab compliance'],
+            order: 4,
+            isActive: true,
+          },
+          {
+            triggers: ['certificate', 'certificates', 'certification', 'fssai', 'apeda', 'iso', 'haccp', 'gmp', 'asta', 'lab'],
+            reply: 'Our export consignments strictly conform to international food safety regulations: FSSAI, APEDA, ISO 22000:2018, HACCP, GMP, and ASTA benchmarks. We supply Phytosanitary Certificate, Fumigation Certificate, Certificate of Origin, and SGS/Eurofins pesticide MRL lab reports.',
+            link: '/brochures',
+            linkText: 'Download Specification Sheets →',
+            suggestions: ['Request sample kit', 'What spices do you export?'],
+            order: 5,
+            isActive: true,
+          },
+          {
+            triggers: ['sample', 'samples', 'moq', 'minimum order', 'order quantity'],
+            reply: 'Physical Sample Kits: We dispatch representative laboratory samples via international courier (DHL / FedEx) for your testing and sensory evaluation. Commercial MOQ: Typically 1 FCL (20ft container ≈ 18-25 MT). We also offer LCL consolidation for trial orders.',
+            link: '/inquiry',
+            linkText: 'Request Physical Sample Kit →',
+            suggestions: ['Send an inquiry', 'Talk to sales team'],
+            order: 6,
+            isActive: true,
+          },
+          {
+            triggers: ['partner', 'partners', 'supplier', 'become partner', 'registration', 'producer'],
+            reply: 'Are you a food manufacturer, miller, or farmer group in India? NMC collaborates with verified Indian food processors and agricultural mills to export worldwide. You can register directly on our Partners page!',
+            link: '/become-a-partner',
+            linkText: 'Submit Partner Registration →',
+            suggestions: ['Browse all products', 'Contact details'],
+            order: 7,
+            isActive: true,
+          },
+          {
+            triggers: ['price', 'pricing', 'quote', 'quotation', 'rate', 'cost', 'cif', 'fob'],
+            reply: 'Agricultural commodity prices fluctuate based on seasonal harvest arrivals and ocean freight rates. To receive an official FOB (Mundra/JNPT) or CIF quotation, please submit an inquiry with your desired quantity and destination port.',
+            link: '/inquiry',
+            linkText: 'Request CIF / FOB Quotation →',
+            suggestions: ['Request sample kit', 'Port transit times'],
+            order: 8,
+            isActive: true,
+          },
+        ],
+      },
     },
   },
   { timestamps: true }

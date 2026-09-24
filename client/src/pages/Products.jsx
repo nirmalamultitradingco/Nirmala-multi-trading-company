@@ -62,8 +62,19 @@ export default function Products() {
   };
 
   return (
-    <div className="container-x py-10 md:py-16 space-y-10">
-      {/* Category Pill Bar & Search (Clean - No Secondary Bar Below It) */}
+    <div className="container-x py-10 md:py-16 space-y-8">
+      {/* Page Header */}
+      <div className="text-center max-w-2xl mx-auto space-y-2">
+        <p className="eyebrow text-moss">{t('products') || 'Product Catalogue'}</p>
+        <h1 className="font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-ink">
+          {t('productDetails') || 'Export Product Catalogue'}
+        </h1>
+        <p className="text-sm text-ink/70 leading-relaxed">
+          {t('productDetailsDesc') || 'Explore Sortex-cleaned export specifications, packaging sizes, origins and HS codes.'}
+        </p>
+      </div>
+
+      {/* Category Pill Bar & Search (Slide bar completely eliminated) */}
       <CategoryPillBar
         segments={segments}
         activeSegment={segment}

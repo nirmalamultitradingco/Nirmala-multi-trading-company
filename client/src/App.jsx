@@ -9,6 +9,7 @@ import SegmentDetail from './pages/SegmentDetail.jsx';
 import Products from './pages/Products.jsx';
 import ProductDetail from './pages/ProductDetail.jsx';
 import Partners from './pages/Partners.jsx';
+import BecomePartner from './pages/BecomePartner.jsx';
 import Brochures from './pages/Brochures.jsx';
 import About from './pages/About.jsx';
 import Inquiry from './pages/Inquiry.jsx';
@@ -75,6 +76,8 @@ export default function App() {
         <Route path="news/:slug" element={<NewsRedirect />} />
 
         <Route path="partners" element={<Partners />} />
+        <Route path="become-a-partner" element={<BecomePartner />} />
+        <Route path="partners/register" element={<Navigate to="/become-a-partner" replace />} />
         <Route path="brochures" element={<Brochures />} />
         <Route path="about" element={<About />} />
         <Route path="inquiry" element={<Inquiry />} />

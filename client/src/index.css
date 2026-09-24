@@ -64,6 +64,19 @@ body {
     @apply inline-flex items-center rounded-full border border-line bg-white px-2.5 py-1
            font-mono text-[11px] uppercase tracking-wide text-ink/70;
   }
+
+  /* Cross-browser scrollbar hiding for horizontal navigation bars */
+  .scrollbar-none,
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar,
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
 }
 
 

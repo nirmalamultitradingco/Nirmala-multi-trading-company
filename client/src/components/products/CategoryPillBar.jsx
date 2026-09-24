@@ -1,4 +1,5 @@
 import { useLanguage } from '../../context/LanguageContext.jsx';
+import { useRef } from 'react';
 
 export default function CategoryPillBar({
   segments = [],
@@ -9,6 +10,16 @@ export default function CategoryPillBar({
   onSearchSubmit,
 }) {
   const { t } = useLanguage();
+  const navRef = useRef(null);
+
+  const scrollNav = (direction) => {
+    if (navRef.current) {
+      navRef.current.scrollBy({
+        left: direction === 'left' ? -220 : 220,
+        behavior: 'smooth',
+      });
+    }
+  };
 
   return (
     <div className="w-full space-y-4">
@@ -50,10 +61,21 @@ export default function CategoryPillBar({
         </form>
       </div>
 
-      {/* Floating Capsule Pill Bar (Aligned to NMC Theme: Forest Green & Harvest Gold) */}
-      <div className="flex justify-center">
+      {/* Floating Capsule Pill Bar (Slide bar hidden with smooth controls) */}
+      <div className="relative mx-auto flex max-w-5xl items-center justify-center px-1">
+        <button
+          type="button"
+          onClick={() => scrollNav('left')}
+          aria-label="Scroll categories left"
+          className="hidden sm:flex shrink-0 -mr-3 z-10 h-7 w-7 items-center justify-center rounded-full border border-line bg-white text-ink shadow-sm transition hover:border-gold hover:text-gold"
+        >
+          ‹
+        </button>
+
         <nav
-          className="inline-flex max-w-full items-center gap-1.5 overflow-x-auto rounded-full border border-[#e8e2d5] bg-[#faf8f4]/95 p-1.5 shadow-[0_8px_30px_rgb(0,0,0,0.06)] backdrop-blur-md scrollbar-none"
+          ref={navRef}
+          className="inline-flex max-w-full items-center gap-1.5 overflow-x-auto rounded-full border border-[#e8e2d5] bg-[#faf8f4]/95 p-1.5 shadow-[0_8px_30px_rgb(0,0,0,0.06)] backdrop-blur-md no-scrollbar scrollbar-none"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           aria-label={t('productSegments') || 'Category filter'}
         >
           {/* All Products Pill */}
@@ -88,6 +110,15 @@ export default function CategoryPillBar({
             );
           })}
         </nav>
+
+        <button
+          type="button"
+          onClick={() => scrollNav('right')}
+          aria-label="Scroll categories right"
+          className="hidden sm:flex shrink-0 -ml-3 z-10 h-7 w-7 items-center justify-center rounded-full border border-line bg-white text-ink shadow-sm transition hover:border-gold hover:text-gold"
+        >
+          ›
+        </button>
       </div>
     </div>
   );

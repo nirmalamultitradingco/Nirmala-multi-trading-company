@@ -45,43 +45,61 @@ export default function Navbar() {
   const { language, setLanguage, t } = useLanguage();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line/70 bg-paper/85 p-4 backdrop-blur">
-      <div className="container-x flex h-16 items-center justify-between gap-5">
-        <Link to="/" className="flex shrink-0 items-center gap-2.5" onClick={() => setOpen(false)}>
+    <header className="sticky top-0 z-40 border-b border-line/80 bg-paper/95 shadow-sm backdrop-blur-md transition-all">
+      <div className="container-x flex h-20 items-center justify-between gap-4">
+        {/* Brand Logo & Name - 100% aligned with container-x */}
+        <Link
+          to="/"
+          className="flex shrink-0 items-center gap-3 transition-opacity hover:opacity-90"
+          onClick={() => setOpen(false)}
+        >
           <img
             src="/NMC logo.png"
             alt={`${BRAND.name} — ${BRAND.tagline}`}
-            className="h-16 w-auto object-contain"
+            className="h-12 w-auto object-contain sm:h-14"
           />
-          <span className="flex flex-col font-display leading-tight">
-            <strong className="text-lg font-extrabold tracking-tight text-ink">{BRAND.fullName}</strong>
-          </span>
+          <div className="flex flex-col leading-tight">
+            <strong className="font-display text-base font-extrabold tracking-tight text-ink sm:text-lg">
+              {BRAND.fullName}
+            </strong>
+            <span className="hidden font-mono text-[10px] uppercase tracking-wider text-moss sm:block">
+              {BRAND.tagline}
+            </span>
+          </div>
         </Link>
 
-        <nav className="hidden items-center gap-7 md:flex">
+        {/* Center / Desktop Navigation Links */}
+        <nav className="hidden items-center gap-6 lg:gap-8 md:flex">
           {nav.map((n) => (
             <NavLink
               key={n.to}
               to={n.to}
               className={({ isActive }) =>
-                `text-sm font-medium transition ${isActive ? 'text-forest' : 'text-ink/70 hover:text-ink'
+                `text-sm font-semibold transition-colors duration-200 ${
+                  isActive
+                    ? 'text-forest font-bold border-b-2 border-forest pb-0.5'
+                    : 'text-ink/75 hover:text-forest'
                 }`
               }
             >
               {getNavLabel(n, t)}
             </NavLink>
           ))}
+        </nav>
 
-          <Link to="/inquiry" className="btn-primary header-quote-btn">
-            <span>{t('getQuote')}</span><span className="header-quote-btn__arrow" aria-hidden="true">↗</span>
+        {/* Header Right Actions (Quote CTA + Language Switcher) */}
+        <div className="hidden items-center gap-3.5 md:flex">
+          <Link to="/inquiry" className="btn-primary text-xs px-5 py-2.5 shadow-sm header-quote-btn">
+            <span>{t('getQuote')}</span>
+            <span className="header-quote-btn__arrow" aria-hidden="true">↗</span>
           </Link>
 
           <label className="relative flex items-center" aria-label={t('language')}>
-            <span className="mr-2 text-base" aria-hidden="true">🌐</span>
+            <span className="mr-1.5 text-sm" aria-hidden="true">🌐</span>
             <select
               value={language}
               onChange={(event) => setLanguage(event.target.value)}
-              className="cursor-pointer appearance-none rounded-full border border-line bg-paper px-3 py-2 pr-8 text-sm font-medium text-ink outline-none transition hover:border-forest focus:border-forest focus:ring-2 focus:ring-forest/15"
+              className="cursor-pointer appearance-none rounded-full border border-line bg-white/90 py-1.5 pl-3 pr-7 text-xs font-semibold text-ink outline-none transition hover:border-forest focus:border-forest shadow-sm"
             >
               {languages.map((item) => (
                 <option key={item.code} value={item.code}>
@@ -89,60 +107,72 @@ export default function Navbar() {
                 </option>
               ))}
             </select>
-            <span className="pointer-events-none absolute right-3 text-xs text-ink/50" aria-hidden="true">⌄</span>
+            <span className="pointer-events-none absolute right-2.5 text-[10px] text-ink/50" aria-hidden="true">⌄</span>
           </label>
-        </nav>
+        </div>
 
+        {/* Mobile Hamburger Button */}
         <button
-          className="md:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-line/80 bg-white p-2 text-ink shadow-sm md:hidden"
           onClick={() => setOpen((o) => !o)}
           aria-label="Toggle menu"
           aria-expanded={open}
         >
-          <div className="space-y-1.5">
-            <span className="block h-0.5 w-6 bg-ink" />
-            <span className="block h-0.5 w-6 bg-ink" />
-            <span className="block h-0.5 w-6 bg-ink" />
+          <div className="space-y-1">
+            <span className={`block h-0.5 w-5 bg-ink transition-transform duration-200 ${open ? 'translate-y-1.5 rotate-45' : ''}`} />
+            <span className={`block h-0.5 w-5 bg-ink transition-opacity duration-200 ${open ? 'opacity-0' : ''}`} />
+            <span className={`block h-0.5 w-5 bg-ink transition-transform duration-200 ${open ? '-translate-y-1.5 -rotate-45' : ''}`} />
           </div>
         </button>
       </div>
 
+      {/* Mobile Navigation Dropdown */}
       {open && (
-        <nav className="border-t border-line bg-paper md:hidden">
-          <div className="container-x flex flex-col py-3">
+        <nav className="border-t border-line bg-paper/98 px-5 py-4 shadow-xl md:hidden">
+          <div className="container-x flex flex-col space-y-2">
             {nav.map((n) => (
               <NavLink
                 key={n.to}
                 to={n.to}
                 onClick={() => setOpen(false)}
                 className={({ isActive }) =>
-                  `py-2 text-sm font-medium ${isActive ? 'text-forest' : 'text-ink/75'}`
+                  `rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                    isActive ? 'bg-forest/10 text-forest font-bold' : 'text-ink/80 hover:bg-black/5'
+                  }`
                 }
               >
                 {getNavLabel(n, t)}
               </NavLink>
             ))}
 
-            <Link to="/inquiry" className="btn-primary mt-3 header-quote-btn" onClick={() => setOpen(false)}>
-              {t('getQuote')}
-            </Link>
-
-            <label className="mt-3 flex items-center gap-2 border-t border-line pt-3 text-sm font-medium text-ink/80">
-              <span aria-hidden="true">🌐</span>
-              <span>{t('language')}</span>
-              <select
-                value={language}
-                onChange={(event) => setLanguage(event.target.value)}
-                className="ml-auto rounded-full border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-forest"
-                aria-label={t('language')}
+            <div className="pt-3 border-t border-line flex flex-col gap-3">
+              <Link
+                to="/inquiry"
+                className="btn-primary w-full text-center py-2.5 text-xs font-bold"
+                onClick={() => setOpen(false)}
               >
-                {languages.map((item) => (
-                  <option key={item.code} value={item.code}>
-                    {item.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+                {t('getQuote')} ↗
+              </Link>
+
+              <label className="flex items-center justify-between rounded-lg border border-line bg-white px-3 py-2 text-xs font-semibold text-ink">
+                <span className="flex items-center gap-1.5">
+                  <span aria-hidden="true">🌐</span>
+                  <span>{t('language')}</span>
+                </span>
+                <select
+                  value={language}
+                  onChange={(event) => setLanguage(event.target.value)}
+                  className="bg-transparent font-medium outline-none text-right cursor-pointer"
+                  aria-label={t('language')}
+                >
+                  {languages.map((item) => (
+                    <option key={item.code} value={item.code}>
+                      {item.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
           </div>
         </nav>
       )}

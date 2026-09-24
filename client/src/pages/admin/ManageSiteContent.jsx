@@ -45,6 +45,55 @@ const defaults = {
       { name: 'American Spice Trade Association', issuer: 'Premier International Spice Trade Body', code: 'asta', description: 'Adherence to ASTA cleanliness specifications, steam sterilization standards, volatile oil content guarantees, and moisture thresholds for North American and world markets.', highlights: ['Cleanliness & purity testing', 'ETO / Steam treated options', 'Strict volatile oil benchmarks'], order: 7, isActive: true },
     ],
   },
+  engineerTrade: {
+    eyebrow: 'Industrial & Large-Scale Operations',
+    title: 'Engineering High-Volume Global Trade',
+    description:
+      'Scalable processing, precision container consolidation, and institutional supply chain reliability from farm gate to global port.',
+    badge: 'FCL & Multi-Container Consignments',
+    items: [
+      {
+        title: 'Sortex Cleaning & Optical Grading',
+        metric: '99.9% Purity',
+        subtitle: 'Zero foreign matter tolerance',
+        description:
+          'Advanced optical Buhler color sorters and gravity separators ensuring clean, uniform export-grade spices and oil seeds.',
+        icon: '🔍',
+        order: 1,
+        isActive: true,
+      },
+      {
+        title: 'Multi-Commodity FCL Consolidation',
+        metric: '500+ TEU / yr',
+        subtitle: 'Mundra & JNPT Port hubs',
+        description:
+          'Stuffing multiple distinct agricultural products into single 20ft/40ft ocean containers to optimize buyer inventory turnover.',
+        icon: '🚢',
+        order: 2,
+        isActive: true,
+      },
+      {
+        title: 'MRL & Phytosanitary Lab Clearance',
+        metric: 'Zero-Rejection',
+        subtitle: 'Certified export compliance',
+        description:
+          'Comprehensive pre-shipment tests for pesticide residue, aflatoxin, heavy metals, and moisture clearance before sailing.',
+        icon: '📋',
+        order: 3,
+        isActive: true,
+      },
+      {
+        title: 'Institutional Bulk & Private Label',
+        metric: 'Custom Pack',
+        subtitle: 'Tailored for retail & food service',
+        description:
+          'From 25kg / 50kg multi-wall paper and PP bags to high-barrier nitrogen-flushed retail standup pouches with buyer branding.',
+        icon: '📦',
+        order: 4,
+        isActive: true,
+      },
+    ],
+  },
   flashCard: {
     isActive: true,
     title: 'India’s Taste. The World’s Table',
@@ -52,6 +101,95 @@ const defaults = {
     image: '',
     buttonText: 'Explore Our Products',
     buttonLink: '/products',
+  },
+  chatbot: {
+    botName: 'TradeMitra',
+    botSubtitle: 'AI Export & Sourcing Assistant',
+    welcomeMessage:
+      'Hello! I am **TradeMitra**, your export & sourcing assistant at **Nirmala Multi Trading Co.** (NMC).\n\nHow can I assist your food import or procurement inquiry today?',
+    defaultSuggestions: [
+      'What spices do you export?',
+      'Shipping to USA, Europe & GCC',
+      'Can I request sample kits?',
+      'Certificates & Quality',
+    ],
+    disclaimer:
+      'Responses are generated based on NMC product catalogues and export shipping specifications.',
+    isActive: true,
+    knowledgeBase: [
+      {
+        triggers: ['spice', 'spices', 'cumin', 'turmeric', 'chilli', 'coriander', 'fenugreek', 'fennel', 'mustard', 'pepper'],
+        reply: 'We export 100% Sortex-cleaned, premium Indian spices directly from farm clusters in Gujarat and Rajasthan: Cumin Seeds (Singapore 99%, Europe 99.5% Sortex), Turmeric (High Curcumin 3-5%), Red Chilli (Teja, Sanman, Byadgi), and Coriander seeds. Steam-sterilized and pesticide compliant.',
+        link: '/products',
+        linkText: 'Browse All Products →',
+        suggestions: ['What is your MOQ?', 'Request sample kit', 'Lab certifications'],
+        order: 1,
+        isActive: true,
+      },
+      {
+        triggers: ['grain', 'grains', 'rice', 'basmati', 'wheat', 'pulse', 'pulses', 'dal', 'chickpea', 'lentil'],
+        reply: 'We supply high-grade Indian agricultural grains and pulses in bulk and retail packs: Basmati Rice (1121 Steam, Sella & Golden Sella 8.35mm+), Non-Basmati (Sona Masoori, PR-11, IR-64), and Pulses (Kabuli Chickpeas 75/80, 58/60, Toor Dal, Moong).',
+        link: '/products',
+        linkText: 'Explore Grain & Rice Catalogue →',
+        suggestions: ['What is your MOQ?', 'Shipping transit time', 'Request pricing'],
+        order: 2,
+        isActive: true,
+      },
+      {
+        triggers: ['dehydrate', 'dehydrated', 'onion', 'garlic', 'flake', 'powder'],
+        reply: 'NMC sources premium dehydrated vegetables from Mahuva, Gujarat: Dehydrated White & Red Onion (Flakes, Minced, Chopped, Powder) and Dehydrated Garlic (Cloves, Flakes, Minced, Pure Powder). Moisture < 6% with zero Salmonella/E. Coli.',
+        link: '/products',
+        linkText: 'View Dehydrated Products →',
+        suggestions: ['Ask for quotation', 'Request sample kit'],
+        order: 3,
+        isActive: true,
+      },
+      {
+        triggers: ['port', 'ports', 'shipping', 'transit', 'logistics', 'container', 'fcl', 'lcl', 'freight', 'mundra', 'jnpt'],
+        reply: 'We handle smooth containerized logistics from Mundra Port (Gujarat) & Nhava Sheva (JNPT, Mumbai). Transit times: GCC 3-7 days, Asia 6-14 days, UK 20-25 days, Europe 18-24 days, USA 22-28 days. Available in FCL and LCL under FOB, CIF, CFR, or DDP terms.',
+        link: '/inquiry',
+        linkText: 'Get Container Freight Quote →',
+        suggestions: ['How to request samples?', 'Pesticide & Lab compliance'],
+        order: 4,
+        isActive: true,
+      },
+      {
+        triggers: ['certificate', 'certificates', 'certification', 'fssai', 'apeda', 'iso', 'haccp', 'gmp', 'asta', 'lab'],
+        reply: 'Our export consignments strictly conform to international food safety regulations: FSSAI, APEDA, ISO 22000:2018, HACCP, GMP, and ASTA benchmarks. We supply Phytosanitary Certificate, Fumigation Certificate, Certificate of Origin, and SGS/Eurofins pesticide MRL lab reports.',
+        link: '/brochures',
+        linkText: 'Download Specification Sheets →',
+        suggestions: ['Request sample kit', 'What spices do you export?'],
+        order: 5,
+        isActive: true,
+      },
+      {
+        triggers: ['sample', 'samples', 'moq', 'minimum order', 'order quantity'],
+        reply: 'Physical Sample Kits: We dispatch representative laboratory samples via international courier (DHL / FedEx) for your testing and sensory evaluation. Commercial MOQ: Typically 1 FCL (20ft container ≈ 18-25 MT). We also offer LCL consolidation for trial orders.',
+        link: '/inquiry',
+        linkText: 'Request Physical Sample Kit →',
+        suggestions: ['Send an inquiry', 'Talk to sales team'],
+        order: 6,
+        isActive: true,
+      },
+      {
+        triggers: ['partner', 'partners', 'supplier', 'become partner', 'registration', 'producer'],
+        reply: 'Are you a food manufacturer, miller, or farmer group in India? NMC collaborates with verified Indian food processors and agricultural mills to export worldwide. You can register directly on our Partners page!',
+        link: '/become-a-partner',
+        linkText: 'Submit Partner Registration →',
+        suggestions: ['Browse all products', 'Contact details'],
+        order: 7,
+        isActive: true,
+      },
+      {
+        triggers: ['price', 'pricing', 'quote', 'quotation', 'rate', 'cost', 'cif', 'fob'],
+        reply: 'Agricultural commodity prices fluctuate based on seasonal harvest arrivals and ocean freight rates. To receive an official FOB (Mundra/JNPT) or CIF quotation, please submit an inquiry with your desired quantity and destination port.',
+        link: '/inquiry',
+        linkText: 'Request CIF / FOB Quotation →',
+        suggestions: ['Request sample kit', 'Port transit times'],
+        order: 8,
+        isActive: true,
+      },
+    ],
   },
 };
 
@@ -849,13 +987,499 @@ function FlashCardEditor({ section, setSection }) {
   );
 }
 
+function EngineerTradeEditor({ section, setSection }) {
+  const current = section || defaults.engineerTrade;
+  const updateField = (field, val) => setSection({ ...current, [field]: val });
+  const updateItem = (i, key, val) => {
+    const items = [...(current.items || [])];
+    items[i] = { ...items[i], [key]: val };
+    setSection({ ...current, items });
+  };
+  const addItem = () => {
+    setSection({
+      ...current,
+      items: [
+        ...(current.items || []),
+        {
+          title: 'New High-Volume Capability',
+          metric: '100% Quality',
+          subtitle: 'Port & Consignment Detail',
+          description: 'Institutional logistics and processing capability.',
+          icon: '🚢',
+          order: (current.items?.length || 0) + 1,
+          isActive: true,
+        },
+      ],
+    });
+  };
+  const removeItem = (i) => {
+    setSection({
+      ...current,
+      items: (current.items || []).filter((_, idx) => idx !== i),
+    });
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Top Banner Inputs */}
+      <div className="rounded-2xl border border-line bg-white p-6 shadow-sm">
+        <h3 className="font-display font-bold text-lg text-ink mb-1">Header & Overview</h3>
+        <p className="text-xs text-ink/60 mb-4">Controls the main headline, category eyebrow, and background badge.</p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="label">Eyebrow / Small Category Tag</label>
+            <input
+              className="field"
+              value={current.eyebrow || ''}
+              onChange={(e) => updateField('eyebrow', e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="label">Badge Pill Label</label>
+            <input
+              className="field"
+              value={current.badge || ''}
+              onChange={(e) => updateField('badge', e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="mt-4">
+          <label className="label">Main Section Heading</label>
+          <input
+            className="field"
+            value={current.title || ''}
+            onChange={(e) => updateField('title', e.target.value)}
+          />
+        </div>
+        <div className="mt-4">
+          <label className="label">Description / Value Proposition</label>
+          <textarea
+            className="field"
+            rows="3"
+            value={current.description || ''}
+            onChange={(e) => updateField('description', e.target.value)}
+          />
+        </div>
+      </div>
+
+      {/* Trade Pillars / Capabilities Editor */}
+      <div className="rounded-2xl border border-line bg-white p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 border-b border-line pb-4">
+          <div>
+            <h3 className="font-display font-bold text-lg text-ink">Industrial Capabilities & Pillars</h3>
+            <p className="text-xs text-ink/60">Features displayed in the high-impact 4-column capabilities grid.</p>
+          </div>
+          <button type="button" className="btn-primary text-xs shrink-0" onClick={addItem}>
+            + Add Capability
+          </button>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          {(current.items || []).map((item, i) => (
+            <div key={item._id || i} className="rounded-xl border border-line bg-[#fbf9f4] p-5 relative shadow-sm">
+              <div className="flex items-center justify-between border-b border-line pb-2 mb-3">
+                <span className="font-mono text-xs font-bold uppercase text-moss">Capability #{i + 1}</span>
+                <button
+                  type="button"
+                  className="text-xs font-semibold text-clay hover:underline"
+                  onClick={() => removeItem(i)}
+                >
+                  Remove
+                </button>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div className="sm:col-span-2">
+                  <label className="label text-xs">Title</label>
+                  <input
+                    className="field text-sm"
+                    value={item.title || ''}
+                    onChange={(e) => updateItem(i, 'title', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="label text-xs">Icon Emoji</label>
+                  <input
+                    className="field text-sm text-center"
+                    value={item.icon || '🚢'}
+                    onChange={(e) => updateItem(i, 'icon', e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="label text-xs">Highlight Metric / Stat</label>
+                  <input
+                    className="field text-sm font-mono"
+                    placeholder="e.g. 99.9% Purity or 500+ TEU"
+                    value={item.metric || ''}
+                    onChange={(e) => updateItem(i, 'metric', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="label text-xs">Subtitle</label>
+                  <input
+                    className="field text-sm"
+                    placeholder="e.g. Mundra & JNPT Port hubs"
+                    value={item.subtitle || ''}
+                    onChange={(e) => updateItem(i, 'subtitle', e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="mt-3">
+                <label className="label text-xs">Detailed Description</label>
+                <textarea
+                  className="field text-xs"
+                  rows="2"
+                  value={item.description || ''}
+                  onChange={(e) => updateItem(i, 'description', e.target.value)}
+                />
+              </div>
+
+              <div className="mt-4 flex items-center justify-between pt-3 border-t border-line/60">
+                <label className="flex items-center gap-2 text-xs font-medium text-ink cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={item.isActive !== false}
+                    onChange={(e) => updateItem(i, 'isActive', e.target.checked)}
+                  />
+                  Active on website
+                </label>
+                <div className="flex items-center gap-1.5 text-xs text-ink/60">
+                  <span>Order:</span>
+                  <input
+                    type="number"
+                    className="field w-14 py-1 text-xs text-center"
+                    value={item.order ?? i + 1}
+                    onChange={(e) => updateItem(i, 'order', Number(e.target.value))}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ChatbotEditor({ section, setSection }) {
+  const current = section || defaults.chatbot;
+
+  const updateField = (field, value) => {
+    setSection({ ...current, [field]: value });
+  };
+
+  const updateSuggestion = (idx, val) => {
+    const next = [...(current.defaultSuggestions || [])];
+    next[idx] = val;
+    updateField('defaultSuggestions', next);
+  };
+
+  const addSuggestion = () => {
+    updateField('defaultSuggestions', [
+      ...(current.defaultSuggestions || []),
+      'New sample question?',
+    ]);
+  };
+
+  const removeSuggestion = (idx) => {
+    updateField(
+      'defaultSuggestions',
+      (current.defaultSuggestions || []).filter((_, i) => i !== idx)
+    );
+  };
+
+  const addKnowledge = () => {
+    const newItem = {
+      triggers: ['new-keyword', 'sample-query'],
+      reply: 'Enter informative response for this query…',
+      link: '/products',
+      linkText: 'Explore Products →',
+      suggestions: ['Inquire Now', 'Contact Sales'],
+      order: (current.knowledgeBase?.length || 0) + 1,
+      isActive: true,
+    };
+    updateField('knowledgeBase', [...(current.knowledgeBase || []), newItem]);
+  };
+
+  const updateKnowledge = (idx, key, val) => {
+    const list = [...(current.knowledgeBase || [])];
+    list[idx] = { ...list[idx], [key]: val };
+    updateField('knowledgeBase', list);
+  };
+
+  const removeKnowledge = (idx) => {
+    if (!confirm('Are you sure you want to delete this chatbot knowledge topic?')) return;
+    updateField(
+      'knowledgeBase',
+      (current.knowledgeBase || []).filter((_, i) => i !== idx)
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Bot Profile & Settings Card */}
+      <div className="rounded-xl border border-line bg-paper/60 p-5 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3">
+          <div>
+            <h3 className="font-display font-bold text-base text-ink">Bot Identity & Presence</h3>
+            <p className="text-xs text-ink/60">Configure public bot appearance, greeting message, and availability.</p>
+          </div>
+          <label className="flex items-center gap-2 cursor-pointer rounded-lg border border-line bg-white px-3 py-1.5 shadow-xs">
+            <input
+              type="checkbox"
+              checked={current.isActive !== false}
+              onChange={(e) => updateField('isActive', e.target.checked)}
+              className="rounded text-forest focus:ring-forest"
+            />
+            <span className="text-xs font-semibold text-ink">
+              {current.isActive !== false ? '✅ Chatbot Enabled' : '⏸️ Chatbot Disabled'}
+            </span>
+          </label>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="label">Bot Display Name</label>
+            <input
+              className="field text-sm font-semibold"
+              value={current.botName || 'TradeMitra'}
+              onChange={(e) => updateField('botName', e.target.value)}
+              placeholder="e.g. TradeMitra"
+            />
+          </div>
+          <div>
+            <label className="label">Bot Role Subtitle / Tagline</label>
+            <input
+              className="field text-sm"
+              value={current.botSubtitle || 'AI Export & Sourcing Assistant'}
+              onChange={(e) => updateField('botSubtitle', e.target.value)}
+              placeholder="e.g. AI Export & Sourcing Assistant"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="label">Welcome Greeting Message</label>
+          <textarea
+            className="field text-xs font-mono"
+            rows="3"
+            value={current.welcomeMessage || ''}
+            onChange={(e) => updateField('welcomeMessage', e.target.value)}
+            placeholder="Initial greeting displayed when visitor opens chatbot..."
+          />
+          <p className="mt-1 text-[11px] text-ink/50">Markdown supported (e.g. **bold**, bullet points).</p>
+        </div>
+
+        <div>
+          <label className="label">Disclaimer / Footnote</label>
+          <input
+            className="field text-xs"
+            value={current.disclaimer || ''}
+            onChange={(e) => updateField('disclaimer', e.target.value)}
+            placeholder="e.g. Responses based on NMC catalogue and export shipping data."
+          />
+        </div>
+      </div>
+
+      {/* Default Prompt Suggestions */}
+      <div className="rounded-xl border border-line bg-white p-5 space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-display font-bold text-base text-ink">Initial Quick Prompt Chips</h3>
+            <p className="text-xs text-ink/60">Suggested questions displayed to the user right under the welcome greeting.</p>
+          </div>
+          <button type="button" onClick={addSuggestion} className="btn-outline text-xs py-1.5 px-3">
+            + Add Suggestion
+          </button>
+        </div>
+
+        <div className="flex flex-wrap gap-2 pt-2">
+          {(current.defaultSuggestions || []).map((sug, idx) => (
+            <div
+              key={idx}
+              className="flex items-center gap-1.5 rounded-full border border-line bg-[#fbf9f4] pl-3 pr-1.5 py-1 text-xs"
+            >
+              <input
+                type="text"
+                value={sug}
+                onChange={(e) => updateSuggestion(idx, e.target.value)}
+                className="bg-transparent text-xs text-ink font-medium focus:outline-none w-48 sm:w-60"
+              />
+              <button
+                type="button"
+                onClick={() => removeSuggestion(idx)}
+                className="h-5 w-5 rounded-full text-ink/40 hover:bg-clay/10 hover:text-clay text-xs flex items-center justify-center"
+                title="Remove suggestion"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Confidentiality & Security Shield Banner */}
+      <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-4 flex items-start gap-3 text-xs text-amber-900">
+        <span className="text-xl">🛡️</span>
+        <div>
+          <p className="font-bold">Automated Privacy & Anti-Leak Shield Active</p>
+          <p className="mt-0.5 text-amber-800/90 leading-relaxed">
+            The chatbot strictly ignores and refuses inquiries containing sensitive keywords (passwords, tokens, database connection strings, inquiry transcripts, or internal credentials). Only information explicitly configured below or in public catalogues will be communicated to visitors.
+          </p>
+        </div>
+      </div>
+
+      {/* Knowledge Base Q&A Manager */}
+      <div className="space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3">
+          <div>
+            <h3 className="font-display font-bold text-lg text-ink">
+              Chatbot Knowledge Base Topics ({(current.knowledgeBase || []).length})
+            </h3>
+            <p className="text-xs text-ink/60">
+              When visitor mentions any of the triggers, the chatbot answers with the specified response and quick action link.
+            </p>
+          </div>
+          <button type="button" className="btn-primary text-xs shrink-0" onClick={addKnowledge}>
+            + Add Q&A Topic
+          </button>
+        </div>
+
+        <div className="grid gap-4">
+          {(current.knowledgeBase || []).map((item, idx) => (
+            <div
+              key={item._id || idx}
+              className="rounded-xl border border-line bg-[#fbf9f4] p-5 relative shadow-sm space-y-4"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line pb-2.5">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-xs font-bold uppercase text-moss">
+                    Topic #{idx + 1}
+                  </span>
+                  <span className="rounded bg-paper px-2 py-0.5 font-mono text-[10px] text-ink/60 border border-line">
+                    {(item.triggers || []).length} keywords
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className="text-xs font-semibold text-clay hover:underline"
+                  onClick={() => removeKnowledge(idx)}
+                >
+                  Remove Topic
+                </button>
+              </div>
+
+              {/* Triggers Input */}
+              <div>
+                <label className="label text-xs">
+                  Keyword Triggers (comma-separated, words matching user question)
+                </label>
+                <input
+                  className="field text-xs font-mono"
+                  value={Array.isArray(item.triggers) ? item.triggers.join(', ') : item.triggers || ''}
+                  onChange={(e) =>
+                    updateKnowledge(
+                      idx,
+                      'triggers',
+                      e.target.value.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean)
+                    )
+                  }
+                  placeholder="e.g. spice, spices, cumin, turmeric, chilli, coriander"
+                />
+              </div>
+
+              {/* Response Text */}
+              <div>
+                <label className="label text-xs">Bot Reply / Answer</label>
+                <textarea
+                  className="field text-xs leading-relaxed"
+                  rows="4"
+                  value={item.reply || ''}
+                  onChange={(e) => updateKnowledge(idx, 'reply', e.target.value)}
+                  placeholder="Comprehensive, accurate export information provided by the bot…"
+                />
+              </div>
+
+              {/* Optional Link & Link Text */}
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="label text-xs">Action Link (Optional URL)</label>
+                  <input
+                    className="field text-xs font-mono"
+                    value={item.link || ''}
+                    onChange={(e) => updateKnowledge(idx, 'link', e.target.value)}
+                    placeholder="e.g. /products, /inquiry, /brochures"
+                  />
+                </div>
+                <div>
+                  <label className="label text-xs">Link Button Text</label>
+                  <input
+                    className="field text-xs"
+                    value={item.linkText || ''}
+                    onChange={(e) => updateKnowledge(idx, 'linkText', e.target.value)}
+                    placeholder="e.g. Browse Spices Catalogue →"
+                  />
+                </div>
+              </div>
+
+              {/* Follow-up suggestions */}
+              <div>
+                <label className="label text-xs">
+                  Follow-up Suggestion Chips (comma-separated chips shown after this response)
+                </label>
+                <input
+                  className="field text-xs"
+                  value={Array.isArray(item.suggestions) ? item.suggestions.join(', ') : item.suggestions || ''}
+                  onChange={(e) =>
+                    updateKnowledge(
+                      idx,
+                      'suggestions',
+                      e.target.value.split(',').map((s) => s.trim()).filter(Boolean)
+                    )
+                  }
+                  placeholder="e.g. What is MOQ?, Request sample kit, Lab compliance"
+                />
+              </div>
+
+              {/* Status and Order */}
+              <div className="flex items-center justify-between pt-3 border-t border-line/60">
+                <label className="flex items-center gap-2 text-xs font-medium text-ink cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={item.isActive !== false}
+                    onChange={(e) => updateKnowledge(idx, 'isActive', e.target.checked)}
+                  />
+                  Active Topic
+                </label>
+                <div className="flex items-center gap-1.5 text-xs text-ink/60">
+                  <span>Order:</span>
+                  <input
+                    type="number"
+                    className="field w-14 py-1 text-xs text-center"
+                    value={item.order ?? idx + 1}
+                    onChange={(e) => updateKnowledge(idx, 'order', Number(e.target.value))}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ManageSiteContent() {
   const [content, setContent] = useState(clone(defaults));
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [tab, setTab] = useState('home');
+  const [tab, setTab] = useState('home_hero');
 
   useEffect(() => {
     api
@@ -872,7 +1496,7 @@ export default function ManageSiteContent() {
     try {
       const r = await api.put('/site-content', content);
       setContent(r.data);
-      setMessage('Changes saved successfully.');
+      setMessage('All website content changes saved successfully.');
     } catch (e) {
       setError(e.message);
     } finally {
@@ -882,199 +1506,340 @@ export default function ManageSiteContent() {
 
   const setSection = (key, value) => setContent({ ...content, [key]: value });
 
-  if (loading) return <p className="text-sm text-ink/60">Loading site content…</p>;
+  if (loading) return <p className="text-sm text-ink/60 p-8">Loading site content…</p>;
 
-  const tabs = [
-    ['home', 'Home'],
-    ['flashcard', 'Flash Card / Ad Popup'],
-    ['map', 'Global Map'],
-    ['certificates', 'Certificates'],
-    ['about', 'About'],
-    ['inquiry', 'Inquiry'],
-    ['testimonials', 'Testimonials'],
+  // Sub-section sidebar grouping
+  const navSections = [
+    {
+      group: 'Home Page',
+      icon: '🏠',
+      items: [
+        { id: 'home_hero', label: 'Hero Video & Ad Slider', icon: '🎬' },
+        { id: 'engineer_trade', label: 'Engineer High Volume Trade', icon: '🚢', badge: 'New' },
+        { id: 'home_offerings', label: 'What We Offer', icon: '📦' },
+        { id: 'home_how_we_work', label: 'How We Work (3 Steps)', icon: '🔄' },
+      ],
+    },
+    {
+      group: 'Trade Corridors',
+      icon: '🗺️',
+      items: [
+        { id: 'map', label: 'Global Export Map & Hubs', icon: '🌐' },
+      ],
+    },
+    {
+      group: 'Quality & Compliance',
+      icon: '🏅',
+      items: [
+        { id: 'certificates', label: 'International Certifications', icon: '📜' },
+      ],
+    },
+    {
+      group: 'Marketing & Leads',
+      icon: '📢',
+      items: [
+        { id: 'flashcard', label: 'Flash Card / Promo Popup', icon: '⚡' },
+        { id: 'testimonials', label: 'Client Feedback & Reviews', icon: '💬' },
+      ],
+    },
+    {
+      group: 'Site Pages',
+      icon: '📄',
+      items: [
+        { id: 'about', label: 'About Us Page Content', icon: '🏢' },
+        { id: 'inquiry', label: 'Inquiry & Quote Header', icon: '✉️' },
+      ],
+    },
+    {
+      group: 'AI Assistant',
+      icon: '🤖',
+      items: [
+        { id: 'chatbot', label: 'TradeMitra Chatbot & Q&A', icon: '💬', badge: 'Editable' },
+      ],
+    },
   ];
 
   return (
-    <div className="max-w-6xl">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <div className="max-w-7xl mx-auto space-y-6">
+      {/* Top Title Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-line pb-4">
         <div>
-          <h1 className="font-display text-2xl font-extrabold">Site Content</h1>
+          <h1 className="font-display text-2xl font-extrabold text-ink">Site Content CMS</h1>
           <p className="mt-1 text-sm text-ink/60">
-            Manage website text, global map corridors, certificates, hero slides, and sections dynamically.
+            Configure dynamic homepage sections, high-volume trade capabilities, global map, certificates, and popups.
           </p>
         </div>
         <button className="btn-primary" onClick={save} disabled={busy}>
-          {busy ? 'Saving…' : 'Save all changes'}
+          {busy ? 'Saving Changes…' : 'Save all changes'}
         </button>
       </div>
 
-      {message && <p className="mt-4 rounded-lg bg-forest/10 px-3 py-2 text-sm text-forest">{message}</p>}
-      {error && <p className="mt-4 rounded-lg bg-clay/10 px-3 py-2 text-sm text-clay">{error}</p>}
+      {message && <p className="rounded-xl bg-forest/10 p-3.5 text-sm font-semibold text-forest border border-forest/20">{message}</p>}
+      {error && <p className="rounded-xl bg-clay/10 p-3.5 text-sm font-semibold text-clay border border-clay/20">{error}</p>}
 
-      <div className="mt-6 flex flex-wrap gap-2 border-b border-line pb-3">
-        {tabs.map(([key, label]) => (
-          <button
-            key={key}
-            className={`rounded-full px-4 py-2 text-sm font-medium ${
-              tab === key ? 'bg-forest text-paper' : 'bg-white text-ink/70 hover:bg-line'
-            }`}
-            onClick={() => setTab(key)}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {tab === 'home' && (
-        <div className="mt-6 space-y-6">
-          <section className="rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
-            <h2 className="font-display text-lg font-bold">Home — Hero Video & Ad Slider</h2>
-            <p className="mt-1 text-sm text-ink/60">
-              Change the first screen of the Home page. Add/remove commercial slides, upload product ad videos (MP4/WebM) and fallback images.
-            </p>
-            <div className="mt-5">
-              <ItemEditor section={content.homeHero} setSection={(v) => setSection('homeHero', v)} image video />
-            </div>
-          </section>
-          <section className="rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
-            <h2 className="font-display text-lg font-bold">Home — What We Offer</h2>
-            <div className="mt-5">
-              <ItemEditor section={content.homeOfferings} setSection={(v) => setSection('homeOfferings', v)} />
-            </div>
-          </section>
-          <section className="rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
-            <h2 className="font-display text-lg font-bold">Home — How We Work</h2>
-            <div className="mt-5">
-              <ItemEditor section={content.homeHowWeWork} setSection={(v) => setSection('homeHowWeWork', v)} />
-            </div>
-          </section>
-        </div>
-      )}
-
-      {tab === 'flashcard' && (
-        <section className="mt-6 rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
-          <h2 className="font-display text-lg font-bold">First-Visit Flash Card / Ad Popup</h2>
-          <p className="mt-1 text-sm text-ink/60">
-            Customize the promotional announcement card shown to visitors right after the brand loader finishes on their initial visit.
+      {/* Two Column Layout: Sticky Sub-section Sidebar + Content Editor Canvas */}
+      <div className="flex flex-col lg:flex-row gap-8 items-start">
+        {/* Left Sub-Section Sidebar */}
+        <aside className="w-full lg:w-72 shrink-0 lg:sticky lg:top-4 bg-white rounded-2xl border border-line p-4 shadow-card space-y-5">
+          <p className="px-2 text-[10px] font-mono uppercase tracking-widest text-ink/40 font-bold">
+            Content Sub-Sections
           </p>
-          <div className="mt-5">
-            <FlashCardEditor
-              section={content.flashCard}
-              setSection={(v) => setSection('flashCard', v)}
-            />
-          </div>
-        </section>
-      )}
 
-      {tab === 'map' && (
-        <section className="mt-6 rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
-          <h2 className="font-display text-lg font-bold">Home — Global Served Map</h2>
-          <p className="mt-1 text-sm text-ink/60">Customize active export corridors, pin positions, ports and transit duration.</p>
-          <div className="mt-5">
-            <MapEditor section={content.globalMap} setSection={(v) => setSection('globalMap', v)} />
-          </div>
-        </section>
-      )}
+          <div className="space-y-4">
+            {navSections.map((sec) => (
+              <div key={sec.group} className="space-y-1">
+                <div className="flex items-center gap-1.5 px-2 py-1 text-xs font-bold text-moss uppercase tracking-wider">
+                  <span>{sec.icon}</span>
+                  <span>{sec.group}</span>
+                </div>
 
-      {tab === 'certificates' && (
-        <section className="mt-6 rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
-          <h2 className="font-display text-lg font-bold">Home — Certificates Slider</h2>
-          <p className="mt-1 text-sm text-ink/60">Add, reorder, or update company certification seals and accreditation logos.</p>
-          <div className="mt-5">
-            <CertificatesEditor section={content.certificates} setSection={(v) => setSection('certificates', v)} />
-          </div>
-        </section>
-      )}
-
-      {tab === 'about' && (
-        <div className="mt-6 space-y-6">
-          <section className="rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
-            <h2 className="font-display text-lg font-bold">About — First Section</h2>
-            <p className="mt-1 text-sm text-ink/60">This controls the first About section.</p>
-            <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className="label">Eyebrow</label>
-                <input
-                  className="field"
-                  value={content.aboutHero.eyebrow || ''}
-                  onChange={(e) => setSection('aboutHero', { ...content.aboutHero, eyebrow: e.target.value })}
-                />
+                <div className="space-y-0.5">
+                  {sec.items.map((item) => {
+                    const isActive = tab === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => setTab(item.id)}
+                        className={`w-full flex items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-semibold transition-all ${
+                          isActive
+                            ? 'bg-forest text-white shadow-sm font-bold border-l-4 border-gold'
+                            : 'text-ink/75 hover:bg-[#fbf9f4] hover:text-ink'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 truncate">
+                          <span className="text-sm leading-none">{item.icon}</span>
+                          <span className="truncate">{item.label}</span>
+                        </div>
+                        {item.badge && (
+                          <span className="rounded bg-gold/90 px-1.5 py-0.2 text-[9px] font-bold text-ink uppercase">
+                            {item.badge}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-              <div>
-                <label className="label">Heading</label>
-                <input
-                  className="field"
-                  value={content.aboutHero.title || ''}
-                  onChange={(e) => setSection('aboutHero', { ...content.aboutHero, title: e.target.value })}
-                />
+            ))}
+          </div>
+        </aside>
+
+        {/* Right Main Editor Canvas */}
+        <div className="flex-1 min-w-0 w-full space-y-6">
+          {/* 1. HOME HERO */}
+          {tab === 'home_hero' && (
+            <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+              <div className="border-b border-line pb-4 mb-5">
+                <h2 className="font-display text-xl font-bold text-ink">Home — Hero Video & Ad Slider</h2>
+                <p className="mt-1 text-xs text-ink/60">
+                  Change the first screen of the Home page. Add/remove commercial slides, upload product ad videos (MP4/WebM) and fallback images.
+                </p>
               </div>
-            </div>
-            <div className="mt-4">
-              <label className="label">Description</label>
-              <textarea
-                className="field"
-                rows="4"
-                value={content.aboutHero.description || ''}
-                onChange={(e) => setSection('aboutHero', { ...content.aboutHero, description: e.target.value })}
+              <ItemEditor section={content.homeHero} setSection={(v) => setSection('homeHero', v)} image video />
+            </section>
+          )}
+
+          {/* 2. ENGINEER HIGH VOLUME TRADE (NEW REQUIREMENT) */}
+          {tab === 'engineer_trade' && (
+            <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+              <div className="border-b border-line pb-4 mb-5">
+                <span className="rounded-full bg-gold/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-ink">
+                  Wholesale & Industrial Operations
+                </span>
+                <h2 className="mt-2 font-display text-xl font-bold text-ink">
+                  Engineer High-Volume Trade Section
+                </h2>
+                <p className="mt-1 text-xs text-ink/60">
+                  Configure large-scale container consolidation, Sortex cleaning, optical grading, and international laboratory compliance features.
+                </p>
+              </div>
+              <EngineerTradeEditor
+                section={content.engineerTrade}
+                setSection={(v) => setSection('engineerTrade', v)}
               />
+            </section>
+          )}
+
+          {/* 3. WHAT WE OFFER */}
+          {tab === 'home_offerings' && (
+            <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+              <div className="border-b border-line pb-4 mb-5">
+                <h2 className="font-display text-xl font-bold text-ink">Home — What We Offer</h2>
+                <p className="mt-1 text-xs text-ink/60">Manage market-specific packaging, private labeling, and export coordination points.</p>
+              </div>
+              <ItemEditor section={content.homeOfferings} setSection={(v) => setSection('homeOfferings', v)} />
+            </section>
+          )}
+
+          {/* 4. HOW WE WORK */}
+          {tab === 'home_how_we_work' && (
+            <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+              <div className="border-b border-line pb-4 mb-5">
+                <h2 className="font-display text-xl font-bold text-ink">Home — How We Work (3-Step Export Bridge)</h2>
+                <p className="mt-1 text-xs text-ink/60">Manage the three steps connecting Indian growers to global buyers.</p>
+              </div>
+              <ItemEditor section={content.homeHowWeWork} setSection={(v) => setSection('homeHowWeWork', v)} />
+            </section>
+          )}
+
+          {/* 5. GLOBAL EXPORT MAP */}
+          {tab === 'map' && (
+            <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+              <div className="border-b border-line pb-4 mb-5">
+                <h2 className="font-display text-xl font-bold text-ink">Global Export Map & Ports</h2>
+                <p className="mt-1 text-xs text-ink/60">Customize active export corridors (USA, UK, Europe, Norway, GCC, Asia), ports, and transit duration.</p>
+              </div>
+              <MapEditor section={content.globalMap} setSection={(v) => setSection('globalMap', v)} />
+            </section>
+          )}
+
+          {/* 6. CERTIFICATES */}
+          {tab === 'certificates' && (
+            <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+              <div className="border-b border-line pb-4 mb-5">
+                <h2 className="font-display text-xl font-bold text-ink">Certificates & Accreditations</h2>
+                <p className="mt-1 text-xs text-ink/60">Manage FSSAI, APEDA, ISO 22000, HACCP, GMP, GHP, ASTA, and custom regulatory seals.</p>
+              </div>
+              <CertificatesEditor section={content.certificates} setSection={(v) => setSection('certificates', v)} />
+            </section>
+          )}
+
+          {/* 7. FLASH CARD MODAL */}
+          {tab === 'flashcard' && (
+            <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+              <div className="border-b border-line pb-4 mb-5">
+                <h2 className="font-display text-xl font-bold text-ink">First-Visit Flash Card / Promo Popup</h2>
+                <p className="mt-1 text-xs text-ink/60">Customize the promotional announcement card shown to visitors right after the brand loader finishes.</p>
+              </div>
+              <FlashCardEditor
+                section={content.flashCard}
+                setSection={(v) => setSection('flashCard', v)}
+              />
+            </section>
+          )}
+
+          {/* 8. TESTIMONIALS */}
+          {tab === 'testimonials' && (
+            <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+              <div className="border-b border-line pb-4 mb-5">
+                <h2 className="font-display text-xl font-bold text-ink">Client Feedback & Testimonials</h2>
+                <p className="mt-1 text-xs text-ink/60">Manage verified international buyer reviews and import testimonials.</p>
+              </div>
+              <ItemEditor section={content.testimonials} setSection={(v) => setSection('testimonials', v)} image />
+            </section>
+          )}
+
+          {/* 9. ABOUT PAGE */}
+          {tab === 'about' && (
+            <div className="space-y-6">
+              <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+                <h2 className="font-display text-lg font-bold text-ink">About Page — Hero Header</h2>
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="label">Eyebrow</label>
+                    <input
+                      className="field"
+                      value={content.aboutHero?.eyebrow || ''}
+                      onChange={(e) => setSection('aboutHero', { ...content.aboutHero, eyebrow: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="label">Heading</label>
+                    <input
+                      className="field"
+                      value={content.aboutHero?.title || ''}
+                      onChange={(e) => setSection('aboutHero', { ...content.aboutHero, title: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <label className="label">Description</label>
+                  <textarea
+                    className="field"
+                    rows="3"
+                    value={content.aboutHero?.description || ''}
+                    onChange={(e) => setSection('aboutHero', { ...content.aboutHero, description: e.target.value })}
+                  />
+                </div>
+              </section>
+
+              <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+                <h2 className="font-display text-lg font-bold text-ink">About — Our Approach</h2>
+                <div className="mt-4">
+                  <ItemEditor section={content.aboutApproach} setSection={(v) => setSection('aboutApproach', v)} image side />
+                </div>
+              </section>
+
+              <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+                <h2 className="font-display text-lg font-bold text-ink">About — Why Choose Us</h2>
+                <div className="mt-4">
+                  <ItemEditor section={content.aboutWhyChooseUs} setSection={(v) => setSection('aboutWhyChooseUs', v)} />
+                </div>
+              </section>
             </div>
-          </section>
-          <section className="rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
-            <h2 className="font-display text-lg font-bold">About — Our Approach</h2>
-            <div className="mt-5">
-              <ItemEditor section={content.aboutApproach} setSection={(v) => setSection('aboutApproach', v)} image side />
-            </div>
-          </section>
-          <section className="rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
-            <h2 className="font-display text-lg font-bold">About — Why Choose Us</h2>
-            <div className="mt-5">
-              <ItemEditor section={content.aboutWhyChooseUs} setSection={(v) => setSection('aboutWhyChooseUs', v)} />
-            </div>
-          </section>
+          )}
+
+          {/* 10. INQUIRY PAGE */}
+          {tab === 'inquiry' && (
+            <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+              <div className="border-b border-line pb-4 mb-4">
+                <h2 className="font-display text-lg font-bold text-ink">Inquiry & Quotation Page Header</h2>
+                <p className="text-xs text-ink/60">Customize the contact and quotation request header text.</p>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="label">Eyebrow</label>
+                  <input
+                    className="field"
+                    value={content.inquiryHero?.eyebrow || ''}
+                    onChange={(e) => setSection('inquiryHero', { ...content.inquiryHero, eyebrow: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="label">Heading</label>
+                  <input
+                    className="field"
+                    value={content.inquiryHero?.title || ''}
+                    onChange={(e) => setSection('inquiryHero', { ...content.inquiryHero, title: e.target.value })}
+                  />
+                </div>
+              </div>
+              <div className="mt-4">
+                <label className="label">Description</label>
+                <textarea
+                  className="field"
+                  rows="3"
+                  value={content.inquiryHero?.description || ''}
+                  onChange={(e) => setSection('inquiryHero', { ...content.inquiryHero, description: e.target.value })}
+                />
+              </div>
+            </section>
+          )}
+
+          {/* 11. CHATBOT KNOWLEDGE & PROFILE */}
+          {tab === 'chatbot' && (
+            <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+              <div className="border-b border-line pb-4 mb-5">
+                <span className="rounded-full bg-gold/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-ink">
+                  AI Website Assistant
+                </span>
+                <h2 className="mt-2 font-display text-xl font-bold text-ink">
+                  TradeMitra Chatbot & Knowledge Base
+                </h2>
+                <p className="mt-1 text-xs text-ink/60">
+                  Manage bot display identity, welcome greeting, suggested chips, and export Q&A topics. Confidential internal data is strictly shielded.
+                </p>
+              </div>
+              <ChatbotEditor
+                section={content.chatbot}
+                setSection={(v) => setSection('chatbot', v)}
+              />
+            </section>
+          )}
         </div>
-      )}
-
-      {tab === 'inquiry' && (
-        <section className="mt-6 rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
-          <h2 className="font-display text-lg font-bold">Inquiry / Get a Quote</h2>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="label">Eyebrow</label>
-              <input
-                className="field"
-                value={content.inquiryHero.eyebrow || ''}
-                onChange={(e) => setSection('inquiryHero', { ...content.inquiryHero, eyebrow: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="label">Heading</label>
-              <input
-                className="field"
-                value={content.inquiryHero.title || ''}
-                onChange={(e) => setSection('inquiryHero', { ...content.inquiryHero, title: e.target.value })}
-              />
-            </div>
-          </div>
-          <div className="mt-4">
-            <label className="label">Description</label>
-            <textarea
-              className="field"
-              rows="4"
-              value={content.inquiryHero.description || ''}
-              onChange={(e) => setSection('inquiryHero', { ...content.inquiryHero, description: e.target.value })}
-            />
-          </div>
-        </section>
-      )}
-
-      {tab === 'testimonials' && (
-        <section className="mt-6 rounded-2xl border border-line bg-white p-5 shadow-card sm:p-7">
-          <h2 className="font-display text-lg font-bold">About — Client Feedback</h2>
-          <div className="mt-5">
-            <ItemEditor section={content.testimonials} setSection={(v) => setSection('testimonials', v)} image />
-          </div>
-        </section>
-      )}
+      </div>
     </div>
   );
 }
+

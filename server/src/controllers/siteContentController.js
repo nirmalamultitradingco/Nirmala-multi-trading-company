@@ -30,6 +30,12 @@ const getOrCreate = async () => {
     modified = true;
   }
 
+  if (!content.chatbot || !content.chatbot.botName) {
+    const fresh = new SiteContent();
+    content.chatbot = fresh.chatbot;
+    modified = true;
+  }
+
   if (modified) {
     await content.save();
   }
@@ -54,7 +60,9 @@ export const updateSiteContent = asyncHandler(async (req, res) => {
     'testimonials',
     'globalMap',
     'certificates',
+    'engineerTrade',
     'flashCard',
+    'chatbot',
   ];
   const update = {};
 

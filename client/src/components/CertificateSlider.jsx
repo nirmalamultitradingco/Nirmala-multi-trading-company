@@ -139,19 +139,19 @@ export default function CertificateSlider() {
 
   return (
     <section
-      className="relative border-t border-line bg-paper py-20 home-reveal-section"
+      className="relative border-t border-line bg-paper py-12 md:py-14 home-reveal-section"
       id="certifications"
       aria-label="Certifications & Accreditations"
     >
       <div className="container-x">
         {/* Section Header */}
-        <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end home-reveal">
+        <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-end home-reveal">
           <div>
-            <p className="eyebrow text-gold">{data.eyebrow || DEFAULT_CERTIFICATES.eyebrow}</p>
-            <h2 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+            <p className="eyebrow text-gold text-xs">{data.eyebrow || DEFAULT_CERTIFICATES.eyebrow}</p>
+            <h2 className="mt-1.5 font-display text-xl font-bold tracking-tight text-ink sm:text-2xl">
               {data.title || DEFAULT_CERTIFICATES.title}
             </h2>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink/70">
+            <p className="mt-2 max-w-2xl text-xs sm:text-sm leading-relaxed text-ink/70">
               {data.description || DEFAULT_CERTIFICATES.description}
             </p>
           </div>
@@ -162,7 +162,7 @@ export default function CertificateSlider() {
               type="button"
               onClick={handlePrev}
               aria-label="Previous certificates"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white text-ink transition hover:border-gold hover:bg-gold/10 hover:text-gold focus:outline-none"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-white text-ink transition hover:border-gold hover:bg-gold/10 hover:text-gold focus:outline-none text-base"
             >
               ‹
             </button>
@@ -170,7 +170,7 @@ export default function CertificateSlider() {
               type="button"
               onClick={handleNext}
               aria-label="Next certificates"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white text-ink transition hover:border-gold hover:bg-gold/10 hover:text-gold focus:outline-none"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-white text-ink transition hover:border-gold hover:bg-gold/10 hover:text-gold focus:outline-none text-base"
             >
               ›
             </button>
@@ -179,7 +179,7 @@ export default function CertificateSlider() {
 
         {/* Carousel Viewport */}
         <div
-          className="mt-10 overflow-hidden"
+          className="mt-6 overflow-hidden"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
           onTouchStart={() => setIsPaused(true)}
@@ -195,13 +195,13 @@ export default function CertificateSlider() {
             {activeItems.map((cert, index) => (
               <div
                 key={cert._id || cert.id || index}
-                className="w-full flex-shrink-0 px-3 sm:w-1/2 lg:w-1/3"
+                className="w-full flex-shrink-0 px-2.5 sm:w-1/2 lg:w-1/3"
               >
-                <div className="group relative flex h-full flex-col justify-between rounded-2xl border border-line bg-white p-7 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-forest/30 hover:shadow-xl">
+                <div className="group relative flex h-full flex-col justify-between rounded-xl border border-line bg-white p-5 sm:p-5.5 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-forest/30 hover:shadow-lg">
                   {/* Top Bar: Authentic Original Logo Image & Tag */}
                   <div>
                     <div className="flex items-start justify-between gap-3">
-                      <div className="flex h-16 w-24 items-center justify-center rounded-xl border border-line/60 bg-paper/60 p-2 shadow-sm transition group-hover:scale-105 group-hover:shadow-md">
+                      <div className="flex h-12 w-20 items-center justify-center rounded-lg border border-line/60 bg-paper/60 p-1.5 shadow-sm transition group-hover:scale-105 group-hover:shadow-md">
                         {cert.image ? (
                           <img
                             src={asset(cert.image)}
@@ -226,7 +226,7 @@ export default function CertificateSlider() {
                     </div>
 
                     {/* Badge & Title */}
-                    <div className="mt-5">
+                    <div className="mt-3.5">
                       <div className="flex items-center gap-2">
                         <span className="font-mono text-xs font-bold text-gold">
                           {cert.code ? cert.code.toUpperCase() : 'ISO/APEDA'}
@@ -234,17 +234,17 @@ export default function CertificateSlider() {
                         <span className="text-xs text-ink/30">•</span>
                         <span className="font-mono text-[11px] text-ink/50">Verified Accreditation</span>
                       </div>
-                      <h3 className="mt-1.5 font-display text-lg font-bold text-ink group-hover:text-forest">
+                      <h3 className="mt-1 font-display text-base font-bold text-ink group-hover:text-forest">
                         {cert.name}
                       </h3>
-                      <p className="mt-1 text-xs font-medium text-moss">
+                      <p className="mt-0.5 text-xs font-medium text-moss">
                         {cert.issuer}
                       </p>
                     </div>
 
                     {/* Description */}
                     {cert.description && (
-                      <p className="mt-3.5 text-xs leading-relaxed text-ink/65">
+                      <p className="mt-2.5 text-xs leading-relaxed text-ink/65">
                         {cert.description}
                       </p>
                     )}
@@ -252,7 +252,7 @@ export default function CertificateSlider() {
 
                   {/* Highlights Bullet List */}
                   {cert.highlights && cert.highlights.length > 0 && (
-                    <div className="mt-6 border-t border-line/70 pt-4">
+                    <div className="mt-4 border-t border-line/70 pt-3">
                       <ul className="space-y-1.5 text-[11px] text-ink/75">
                         {cert.highlights.map((h, i) => (
                           <li key={i} className="flex items-center gap-2">

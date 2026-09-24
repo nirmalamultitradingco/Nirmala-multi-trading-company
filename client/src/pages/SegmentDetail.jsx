@@ -55,17 +55,25 @@ export default function SegmentDetail() {
             />
           </div>
         )}
-        <div className="container-x relative py-16 md:py-20">
+        <div className="container-x relative py-16 md:py-20 flex flex-wrap items-end justify-between gap-6">
+          <div className="max-w-2xl">
+            <Link
+              to="/products"
+              className="font-mono text-xs uppercase tracking-widest text-moss hover:underline"
+            >
+              ← {t('products') || 'All Products'}
+            </Link>
+            <h1 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
+              {segment.name}
+            </h1>
+            <p className="mt-4 text-lg text-ink/65">{segment.description}</p>
+          </div>
           <Link
-            to="/products"
-            className="font-mono text-xs uppercase tracking-widest text-moss hover:underline"
+            to={`/inquiry?segment=${segment._id}`}
+            className="btn-primary shrink-0 shadow-sm"
           >
-            ← {t('products') || 'All Products'}
+            Inquire about {segment.name} →
           </Link>
-          <h1 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
-            {segment.name}
-          </h1>
-          <p className="mt-4 max-w-2xl text-lg text-ink/65">{segment.description}</p>
         </div>
       </section>
 
