@@ -14,6 +14,9 @@ const blank = {
   order: 0,
   isActive: true,
   featured: false,
+  notifySubscribers: false,
+  broadcastSubject: '',
+  broadcastMessage: '',
 };
 
 const dateValue = (v) => (v ? new Date(v).toISOString().slice(0, 10) : '');
@@ -25,6 +28,19 @@ export default function ManageNews() {
   const [form, setForm] = useState(blank);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [bannerSuccess, setBannerSuccess] = useState('');
+
+  // Blog broadcast modal state
+  const [broadcastItem, setBroadcastItem] = useState(null);
+  const [broadcastSubject, setBroadcastSubject] = useState('');
+  const [broadcastMessage, setBroadcastMessage] = useState('');
+  const [sendingBroadcast, setSendingBroadcast] = useState(false);
+  const [broadcastResult, setBroadcastResult] = useState(null);
+
+  // Test email state
+  const [testEmailTarget, setTestEmailTarget] = useState('');
+  const [sendingTest, setSendingTest] = useState(false);
+  const [testResult, setTestResult] = useState(null);
 
   const load = () =>
     api.get('/news', { params: { all: true } }).then((r) => setItems(r.data || []));
@@ -48,9 +64,23 @@ export default function ManageNews() {
       images: Array.isArray(item.images) ? item.images : [],
       sections: Array.isArray(item.sections) ? item.sections : [],
       publishedAt: dateValue(item.publishedAt),
+      notifySubscribers: false,
+      broadcastSubject: `📰 Article: ${item.title || ''}`,
+      broadcastMessage: item.excerpt || '',
     });
     setError('');
     setOpen(true);
+  };
+
+  const openBroadcastModal = (item) => {
+    setBroadcastItem(item);
+    setBroadcastSubject(`📰 New Export Intelligence Article: ${item.title || 'Market Update'}`);
+    setBroadcastMessage(
+      item.excerpt ||
+      (item.content ? item.content.slice(0, 220) + '…' : 'Read the latest agricultural trade insights published by NMC.')
+    );
+    setBroadcastResult(null);
+    setTestResult(null);
   };
 
   // Gallery image helpers
@@ -99,6 +129,51 @@ export default function ManageNews() {
     setForm({ ...form, sections: nextSections });
   };
 
+  const handleSendBroadcast = async (e) => {
+    e.preventDefault();
+    if (!broadcastItem || !broadcastSubject.trim()) return;
+
+    try {
+      setSendingBroadcast(true);
+      setBroadcastResult(null);
+
+      const res = await api.post(`/news/${broadcastItem._id}/broadcast`, {
+        subject: broadcastSubject.trim(),
+        message: broadcastMessage.trim(),
+      });
+
+      setBroadcastResult(res.data);
+      setBannerSuccess(res.data?.message || 'Blog broadcast successfully dispatched to subscribers!');
+      setTimeout(() => setBannerSuccess(''), 6000);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to dispatch blog broadcast.');
+    } finally {
+      setSendingBroadcast(false);
+    }
+  };
+
+  const handleSendTestEmail = async (e) => {
+    e.preventDefault();
+    if (!broadcastItem || !testEmailTarget.trim()) return;
+
+    try {
+      setSendingTest(true);
+      setTestResult(null);
+
+      const res = await api.post(`/news/${broadcastItem._id}/broadcast`, {
+        subject: broadcastSubject.trim() || `📰 Article: ${broadcastItem.title}`,
+        message: broadcastMessage.trim(),
+        testEmail: testEmailTarget.trim(),
+      });
+
+      setTestResult(res.data);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to send test email.');
+    } finally {
+      setSendingTest(false);
+    }
+  };
+
   const save = async (e) => {
     e.preventDefault();
     setBusy(true);
@@ -117,6 +192,10 @@ export default function ManageNews() {
       else await api.post('/news', payload);
 
       setOpen(false);
+      if (form.notifySubscribers) {
+        setBannerSuccess('Blog post saved and email notification dispatched to subscribers!');
+        setTimeout(() => setBannerSuccess(''), 6000);
+      }
       await load();
     } catch (err) {
       setError(err.message);
@@ -139,15 +218,28 @@ export default function ManageNews() {
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-extrabold text-ink">Blog</h1>
+          <h1 className="font-display text-2xl font-extrabold text-ink">Blog & News</h1>
           <p className="mt-1 text-sm text-ink/60">
-            Add, edit, publish and manage website blog posts, multiple images, and market articles.
+            Publish export articles, market intelligence, and broadcast updates to your subscribers.
           </p>
         </div>
         <button className="btn-primary" onClick={openNew}>
           + Add blog post
         </button>
       </div>
+
+      {bannerSuccess && (
+        <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 shadow-sm flex items-center justify-between">
+          <span>✓ {bannerSuccess}</span>
+          <button
+            type="button"
+            onClick={() => setBannerSuccess('')}
+            className="text-emerald-600 hover:text-emerald-900 font-bold"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       <div className="mt-6 grid gap-4">
         {items.map((item) => (
@@ -187,7 +279,15 @@ export default function ManageNews() {
               </h2>
               <p className="mt-1 line-clamp-2 text-sm text-ink/55">{item.excerpt}</p>
             </div>
-            <div className="flex shrink-0 gap-2">
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-forest/30 bg-forest/5 px-3 py-1.5 text-xs font-bold text-forest transition hover:bg-forest hover:text-white"
+                onClick={() => openBroadcastModal(item)}
+                title="Send email broadcast to subscribers about this post"
+              >
+                <span>✉️</span> Mail Subscribers
+              </button>
               <button className="btn-outline" onClick={() => openEdit(item)}>
                 Edit
               </button>
@@ -375,6 +475,48 @@ export default function ManageNews() {
             )}
           </div>
 
+          {/* Email Notification to Subscribers Section */}
+          <div className="rounded-2xl border border-line bg-paper/60 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-display text-sm font-bold text-ink">📢 Email Notification to Subscribers</h3>
+                <p className="text-xs text-ink/60">Broadcast this blog article directly to your active newsletter subscribers when saved.</p>
+              </div>
+              <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer text-forest bg-forest/5 px-3 py-1.5 rounded-full border border-forest/20">
+                <input
+                  type="checkbox"
+                  checked={form.notifySubscribers}
+                  onChange={(e) => setForm({ ...form, notifySubscribers: e.target.checked })}
+                />
+                <span>Email Subscribers on Save</span>
+              </label>
+            </div>
+
+            {form.notifySubscribers && (
+              <div className="mt-3 space-y-3 pt-3 border-t border-line/60">
+                <div>
+                  <label className="label text-xs">Custom Email Subject</label>
+                  <input
+                    className="field text-xs"
+                    placeholder="e.g. 📰 New Export Article: India's Agricultural Boom"
+                    value={form.broadcastSubject}
+                    onChange={(e) => setForm({ ...form, broadcastSubject: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="label text-xs">Custom Email Intro / Note</label>
+                  <textarea
+                    className="field text-xs"
+                    rows="2"
+                    placeholder="Brief intro for the email announcement..."
+                    value={form.broadcastMessage}
+                    onChange={(e) => setForm({ ...form, broadcastMessage: e.target.value })}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
           <div className="flex flex-wrap gap-5">
             <label className="flex items-center gap-2 text-sm">
               <input
@@ -401,11 +543,173 @@ export default function ManageNews() {
               Cancel
             </button>
             <button className="btn-primary" disabled={busy}>
-              {busy ? 'Saving…' : 'Save article'}
+              {busy ? 'Saving…' : form.notifySubscribers ? 'Save & Broadcast Email' : 'Save article'}
             </button>
           </div>
         </form>
       </Modal>
+
+      {/* Broadcast Blog Post Modal */}
+      {broadcastItem && (
+        <Modal
+          open={true}
+          title={`✉️ Broadcast Blog to Subscribers`}
+          onClose={() => setBroadcastItem(null)}
+          wide
+        >
+          <div className="space-y-4">
+            {/* Post Summary & Photo Preview Card */}
+            <div className="rounded-2xl border border-line bg-[#fbf9f4] p-4 space-y-3">
+              <div className="flex items-start gap-4">
+                <div className="h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-white border border-line shadow-xs">
+                  {broadcastItem.image ? (
+                    <img
+                      src={asset(broadcastItem.image)}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  ) : broadcastItem.images && broadcastItem.images[0] ? (
+                    <img
+                      src={asset(broadcastItem.images[0])}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="grid h-full place-items-center text-[10px] text-ink/40">No photo</div>
+                  )}
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-forest bg-forest/10 px-2 py-0.5 rounded">
+                      FULL BLOG ARTICLE
+                    </span>
+                    {broadcastItem.images?.length > 0 && (
+                      <span className="font-mono text-[10px] font-bold text-gold-dark bg-gold/15 px-2 py-0.5 rounded">
+                        📷 {broadcastItem.images.length} Attached Photo(s)
+                      </span>
+                    )}
+                  </div>
+                  <h4 className="mt-1 font-display text-base font-bold text-ink">
+                    {broadcastItem.title}
+                  </h4>
+                  <p className="mt-1 text-xs text-ink/65 line-clamp-2">
+                    {broadcastItem.content ? broadcastItem.content.slice(0, 180) + '…' : broadcastItem.excerpt}
+                  </p>
+                </div>
+              </div>
+
+              {/* Informational banner */}
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-2.5 text-xs text-emerald-900 flex items-center gap-2">
+                <span className="text-base">✨</span>
+                <span>
+                  <strong>Full Article Delivery:</strong> Subscribers will receive this exact blog post with its cover photo, full article text, and all attached photos.
+                </span>
+              </div>
+            </div>
+
+            <form onSubmit={handleSendBroadcast} className="space-y-4">
+              <div>
+                <label className="label text-xs">Email Subject Line *</label>
+                <input
+                  required
+                  className="field text-sm"
+                  value={broadcastSubject}
+                  onChange={(e) => setBroadcastSubject(e.target.value)}
+                  placeholder="e.g. 📰 New Export Intelligence Article: ..."
+                />
+              </div>
+
+              <div>
+                <label className="label text-xs">Introductory Message / Excerpt for Newsletter</label>
+                <textarea
+                  className="field text-xs"
+                  rows="3"
+                  value={broadcastMessage}
+                  onChange={(e) => setBroadcastMessage(e.target.value)}
+                  placeholder="Write an inviting excerpt for your subscribers..."
+                />
+              </div>
+
+              {/* Test Email Section */}
+              <div className="rounded-xl border border-amber-200 bg-amber-50/80 p-3.5 text-xs space-y-2">
+                <span className="font-bold text-amber-900 block">
+                  🧪 Send Test Email First (Verify Delivery):
+                </span>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    placeholder="Enter your email to test (e.g. yourname@gmail.com)…"
+                    value={testEmailTarget}
+                    onChange={(e) => setTestEmailTarget(e.target.value)}
+                    className="flex-1 rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-xs text-ink outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSendTestEmail}
+                    disabled={sendingTest || !testEmailTarget}
+                    className="rounded-lg bg-amber-700 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-amber-800 disabled:opacity-50 whitespace-nowrap shadow-sm transition"
+                  >
+                    {sendingTest ? 'Sending…' : 'Send Test Mail'}
+                  </button>
+                </div>
+
+                {testResult && (
+                  <div className="rounded-lg bg-white p-2.5 border border-amber-200 text-xs space-y-1">
+                    <p className="font-semibold text-emerald-800">✓ {testResult.message}</p>
+                    {testResult.previewUrl && (
+                      <div className="flex items-center justify-between pt-1">
+                        <span className="text-[11px] text-ink/60">Test mailbox preview link:</span>
+                        <a
+                          href={testResult.previewUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="rounded bg-amber-700 px-2 py-0.5 text-[11px] font-bold text-white hover:bg-amber-800 transition"
+                        >
+                          Open Preview ↗
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {broadcastResult && (
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-900 space-y-1">
+                  <p className="font-bold">✓ {broadcastResult.message}</p>
+                  {broadcastResult.log?.previewUrl && (
+                    <a
+                      href={broadcastResult.log.previewUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-block mt-1 text-emerald-700 underline font-bold"
+                    >
+                      View Generated Email in Test Mailbox ↗
+                    </a>
+                  )}
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-line/60">
+                <button
+                  type="button"
+                  className="btn-outline"
+                  onClick={() => setBroadcastItem(null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={sendingBroadcast || !broadcastSubject.trim()}
+                  className="rounded-xl bg-forest px-5 py-2 text-xs font-bold text-white shadow-md hover:bg-forest/90 disabled:opacity-50"
+                >
+                  {sendingBroadcast ? 'Dispatching Broadcast…' : '🚀 Send to All Active Subscribers'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

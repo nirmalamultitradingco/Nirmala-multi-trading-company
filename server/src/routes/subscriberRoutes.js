@@ -8,6 +8,7 @@ import {
   getBroadcastLogs,
   testBroadcastEmail,
   getSmtpStatus,
+  broadcastArrival,
 } from '../controllers/subscriberController.js';
 import { protect } from '../middleware/auth.js';
 
@@ -25,6 +26,7 @@ router.get('/smtp-status', protect, getSmtpStatus);
 router.get('/', protect, getAllSubscribers);
 router.delete('/:id', protect, deleteSubscriber);
 router.post('/broadcast', protect, broadcastMessage);
+router.post('/broadcast-arrival', protect, broadcastArrival);
 router.post('/test-email', protect, testBroadcastEmail);
 router.get('/broadcasts', protect, getBroadcastLogs);
 

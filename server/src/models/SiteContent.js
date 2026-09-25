@@ -532,6 +532,105 @@ const siteContentSchema = new mongoose.Schema(
         ],
       },
     },
+    productsPage: {
+      isActive: { type: Boolean, default: true },
+      hero: {
+        badge: { type: String, default: 'Global Agro-Food Catalogue' },
+        eyebrow: { type: String, default: 'CERTIFIED INDIAN EXPORTS' },
+        title: { type: String, default: 'All Export Food Products' },
+        subtitle: {
+          type: String,
+          default:
+            '100% Sortex-cleaned Indian spices, premium grains, pulses, and value-added food products ready for containerized ocean shipping.',
+        },
+      },
+      showcase: {
+        isActive: { type: Boolean, default: true },
+        defaultMode: { type: String, enum: ['wheel', 'arc'], default: 'wheel' },
+        title: { type: String, default: 'Featured Export Products' },
+        subtitle: {
+          type: String,
+          default:
+            'Discover our certified Sortex-cleaned harvest lots and premium packaged Indian food products ready for global ocean freight.',
+        },
+        watermark: { type: String, default: 'FOOD PRODUCTS' },
+        autoRotateSeconds: { type: Number, default: 3.5 },
+        showcaseBadge: { type: String, default: 'FEATURED FOOD SHOWCASE' },
+        keepCustomTitle: { type: Boolean, default: false },
+      },
+      bento: {
+        badge: { type: String, default: 'DIRECT SOURCING GUARANTEE' },
+        headline: { type: String, default: 'Global Food Products, Perfected' },
+        subtitle: {
+          type: String,
+          default:
+            'Direct sourcing of export-grade Indian spices, premium grains, and food products with certified global shipping.',
+        },
+        bullets: {
+          type: [String],
+          default: [
+            'Direct Mundra Port (INMUN1) & JNPT Container Stuffing',
+            'APEDA, Spice Board of India & FSSAI Registered Consignments',
+            'European MRL & ASTA Purity Compliance with Full Batch Traceability',
+            'Customized Retail Standup Pouches & Institutional Bulk Bags',
+          ],
+        },
+        buttonText: { type: String, default: 'Request Container Quotation' },
+        buttonLink: { type: String, default: '/inquiry' },
+      },
+      trustBar: {
+        isActive: { type: Boolean, default: true },
+        title: { type: String, default: 'Why Global Buyers Trust NMC' },
+        items: {
+          type: [
+            new mongoose.Schema(
+              {
+                icon: { type: String, default: '✨' },
+                title: { type: String, default: '' },
+                text: { type: String, default: '' },
+              },
+              { _id: true }
+            ),
+          ],
+          default: [
+            {
+              icon: '🔍',
+              title: '100% Sortex Optical Cleaning',
+              text: 'Laser graded to 99.5% European purity with zero foreign contaminants.',
+            },
+            {
+              icon: '🚢',
+              title: 'Port-Direct Logistics',
+              text: 'Express sailings from Mundra Port and JNPT Nhava Sheva to worldwide ports.',
+            },
+            {
+              icon: '📜',
+              title: 'Phyto & MRL Compliance',
+              text: 'Pre-shipment phytosanitary and aflatoxin lab assays with every container.',
+            },
+            {
+              icon: '📦',
+              title: 'Custom Packaging & Branding',
+              text: 'From 25kg multi-wall paper bags to buyer-branded retail standup pouches.',
+            },
+          ],
+        },
+      },
+      ctaBanner: {
+        isActive: { type: Boolean, default: true },
+        eyebrow: { type: String, default: 'READY FOR EXPORT ORDERS' },
+        title: { type: String, default: 'Need Container Freight Quotations or Custom Samples?' },
+        description: {
+          type: String,
+          default:
+            'Our international trade desk prepares formal FOB (Mundra/JNPT) or CIF proforma invoices within 12–24 business hours. Courier sample kits dispatched worldwide.',
+        },
+        buttonPrimaryText: { type: String, default: 'Request Official Quotation →' },
+        buttonPrimaryLink: { type: String, default: '/inquiry' },
+        buttonSecondaryText: { type: String, default: 'Download Product Brochures' },
+        buttonSecondaryLink: { type: String, default: '/brochures' },
+      },
+    },
   },
   { timestamps: true }
 );

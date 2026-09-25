@@ -42,6 +42,44 @@ const getOrCreate = async () => {
     modified = true;
   }
 
+  if (!content.productsPage || !content.productsPage.hero) {
+    const fresh = new SiteContent();
+    content.productsPage = fresh.productsPage;
+    modified = true;
+  } else {
+    const fresh = new SiteContent();
+    let subModified = false;
+    if (!content.productsPage.showcase) {
+      content.productsPage.showcase = fresh.productsPage.showcase;
+      subModified = true;
+    } else {
+      if (content.productsPage.showcase.isActive === undefined) {
+        content.productsPage.showcase.isActive = true;
+        subModified = true;
+      }
+      if (content.productsPage.showcase.showcaseBadge === undefined) {
+        content.productsPage.showcase.showcaseBadge = 'FEATURED FOOD SHOWCASE';
+        subModified = true;
+      }
+    }
+    if (!content.productsPage.bento || !content.productsPage.bento.headline) {
+      content.productsPage.bento = fresh.productsPage.bento;
+      subModified = true;
+    }
+    if (!content.productsPage.trustBar || !content.productsPage.trustBar.items || content.productsPage.trustBar.items.length === 0) {
+      content.productsPage.trustBar = fresh.productsPage.trustBar;
+      subModified = true;
+    }
+    if (!content.productsPage.ctaBanner || !content.productsPage.ctaBanner.title) {
+      content.productsPage.ctaBanner = fresh.productsPage.ctaBanner;
+      subModified = true;
+    }
+    if (subModified) {
+      content.markModified('productsPage');
+      modified = true;
+    }
+  }
+
   if (modified) {
     await content.save();
   }
@@ -70,6 +108,7 @@ export const updateSiteContent = asyncHandler(async (req, res) => {
     'flashCard',
     'chatbot',
     'newArrivals',
+    'productsPage',
   ];
   const update = {};
 

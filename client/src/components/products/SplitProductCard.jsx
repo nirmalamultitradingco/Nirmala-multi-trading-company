@@ -78,11 +78,23 @@ export function SplitProductCard({ product }) {
  * Bento Highlight Feature Banner (NMC Brand Forest Green & Gold)
  */
 export function BentoHighlightCard({
+  badge,
   title = 'Export Purity, Perfected',
   subtitle = 'Light, crispy snack foods & pure farm harvests crafted with uncompromising international food standards.',
-  bullet = '100% Sortex Cleaned · Phytosanitary Certified · Custom Buyer Labeling',
+  bullet,
+  bullets,
+  buttonText,
+  buttonLink = '/inquiry',
+  secondaryButtonText,
+  secondaryButtonLink = '/brochures',
 }) {
   const { t } = useLanguage();
+
+  const bulletList = Array.isArray(bullets) && bullets.length > 0
+    ? bullets
+    : bullet
+      ? [bullet]
+      : ['100% Sortex Cleaned · Phytosanitary Certified · Custom Buyer Labeling'];
 
   return (
     <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0f2b20] to-[#16382b] p-7 sm:p-9 text-paper shadow-lg border border-gold/30 md:col-span-2">
@@ -91,9 +103,9 @@ export function BentoHighlightCard({
         NMC
       </span>
 
-      <div className="relative z-10 max-w-lg">
+      <div className="relative z-10 max-w-xl">
         <span className="inline-block rounded-full bg-gold/20 px-3 py-1 font-mono text-[11px] font-bold uppercase tracking-wider text-gold border border-gold/40">
-          {t('exporterCommitment') || 'EXPORTER COMMITMENT'}
+          {badge || t('exporterCommitment') || 'EXPORTER COMMITMENT'}
         </span>
         <h3 className="mt-3 font-display text-2xl sm:text-3xl font-black leading-tight text-white">
           {title}
@@ -101,22 +113,28 @@ export function BentoHighlightCard({
         <p className="mt-2 text-sm text-paper/80 leading-relaxed">
           {subtitle}
         </p>
-        <p className="mt-3 font-mono text-xs text-gold/90 font-medium">
-          ✓ {bullet}
-        </p>
+
+        <div className="mt-3.5 space-y-1.5">
+          {bulletList.map((item, idx) => (
+            <p key={idx} className="font-mono text-xs text-gold/90 font-medium flex items-center gap-1.5">
+              <span className="text-gold font-bold">✓</span>
+              <span>{item}</span>
+            </p>
+          ))}
+        </div>
 
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
-            to="/inquiry"
+            to={buttonLink || '/inquiry'}
             className="rounded-full bg-gold px-5 py-2.5 text-xs font-bold text-ink shadow-md transition hover:bg-gold/90 hover:scale-105"
           >
-            {t('requestContainerQuote') || 'Request Container CIF Quote'} →
+            {buttonText || t('requestContainerQuote') || 'Request Container CIF Quote'} →
           </Link>
           <Link
-            to="/brochures"
+            to={secondaryButtonLink || '/brochures'}
             className="rounded-full border border-white/30 bg-white/10 px-5 py-2.5 text-xs font-semibold text-white transition hover:bg-white/20"
           >
-            {t('downloadLineCard') || 'Download Line Card'} 📄
+            {secondaryButtonText || t('downloadLineCard') || 'Download Line Card'} 📄
           </Link>
         </div>
       </div>

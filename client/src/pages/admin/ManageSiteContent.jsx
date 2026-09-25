@@ -266,6 +266,78 @@ const defaults = {
       },
     ],
   },
+  productsPage: {
+    isActive: true,
+    hero: {
+      badge: 'Global Agro-Food Catalogue',
+      eyebrow: 'CERTIFIED INDIAN EXPORTS',
+      title: 'All Export Food Products',
+      subtitle:
+        '100% Sortex-cleaned Indian spices, premium grains, pulses, and value-added food products ready for containerized ocean shipping.',
+    },
+    showcase: {
+      isActive: true,
+      defaultMode: 'wheel',
+      title: 'Featured Export Products',
+      subtitle:
+        'Discover our certified Sortex-cleaned harvest lots and premium packaged Indian food products ready for global ocean freight.',
+      watermark: 'FOOD PRODUCTS',
+      autoRotateSeconds: 3.5,
+      showcaseBadge: 'FEATURED FOOD SHOWCASE',
+      keepCustomTitle: false,
+    },
+    bento: {
+      badge: 'DIRECT SOURCING GUARANTEE',
+      headline: 'Global Food Products, Perfected',
+      subtitle:
+        'Direct sourcing of export-grade Indian spices, premium grains, and food products with certified global shipping.',
+      bullets: [
+        'Direct Mundra Port (INMUN1) & JNPT Container Stuffing',
+        'APEDA, Spice Board of India & FSSAI Registered Consignments',
+        'European MRL & ASTA Purity Compliance with Full Batch Traceability',
+        'Customized Retail Standup Pouches & Institutional Bulk Bags',
+      ],
+      buttonText: 'Request Container Quotation',
+      buttonLink: '/inquiry',
+    },
+    trustBar: {
+      isActive: true,
+      title: 'Why Global Buyers Trust NMC',
+      items: [
+        {
+          icon: '🔍',
+          title: '100% Sortex Optical Cleaning',
+          text: 'Laser graded to 99.5% European purity with zero foreign contaminants.',
+        },
+        {
+          icon: '🚢',
+          title: 'Port-Direct Logistics',
+          text: 'Express sailings from Mundra Port and JNPT Nhava Sheva to worldwide ports.',
+        },
+        {
+          icon: '📜',
+          title: 'Phyto & MRL Compliance',
+          text: 'Pre-shipment phytosanitary and aflatoxin lab assays with every container.',
+        },
+        {
+          icon: '📦',
+          title: 'Custom Packaging & Branding',
+          text: 'From 25kg multi-wall paper bags to buyer-branded retail standup pouches.',
+        },
+      ],
+    },
+    ctaBanner: {
+      isActive: true,
+      eyebrow: 'READY FOR EXPORT ORDERS',
+      title: 'Need Container Freight Quotations or Custom Samples?',
+      description:
+        'Our international trade desk prepares formal FOB (Mundra/JNPT) or CIF proforma invoices within 12–24 business hours. Courier sample kits dispatched worldwide.',
+      buttonPrimaryText: 'Request Official Quotation →',
+      buttonPrimaryLink: '/inquiry',
+      buttonSecondaryText: 'Download Product Brochures',
+      buttonSecondaryLink: '/brochures',
+    },
+  },
 };
 
 const clone = (v) => JSON.parse(JSON.stringify(v));
@@ -1551,6 +1623,18 @@ function ChatbotEditor({ section, setSection }) {
 function NewArrivalsEditor({ section, setSection }) {
   const current = section || defaults.newArrivals;
 
+  // Broadcast modal state for arrivals
+  const [broadcastTarget, setBroadcastTarget] = useState(null); // null | 'all' | item object
+  const [broadcastSubject, setBroadcastSubject] = useState('');
+  const [broadcastHeading, setBroadcastHeading] = useState('');
+  const [broadcastMessage, setBroadcastMessage] = useState('');
+  const [broadcastLink, setBroadcastLink] = useState('/products');
+  const [testEmailTarget, setTestEmailTarget] = useState('');
+  const [sendingBroadcast, setSendingBroadcast] = useState(false);
+  const [sendingTest, setSendingTest] = useState(false);
+  const [broadcastResult, setBroadcastResult] = useState(null);
+  const [testResult, setTestResult] = useState(null);
+
   const updateField = (field, value) => {
     setSection({ ...current, [field]: value });
   };
@@ -1590,6 +1674,82 @@ function NewArrivalsEditor({ section, setSection }) {
     });
   };
 
+  const openBroadcastAll = () => {
+    const itemsList = (current.items || []).map((it) => `• ${it.name} (${it.categoryName || 'Agro Commodity'}) — Origin: ${it.origin || 'Gujarat'}`).join('\n');
+    setBroadcastTarget('all');
+    setBroadcastSubject(`🌟 Fresh Seasonal Crop Arrivals 2026: New Indian Export Commodities`);
+    setBroadcastHeading('Fresh Seasonal Harvest Lots Now Ready for Ocean Container Loading');
+    setBroadcastMessage(
+      `We are pleased to introduce our latest agricultural export arrivals sourced directly from verified farm mandis across Gujarat and North India:\n\n${itemsList}\n\n100% Sortex laser graded with complete laboratory assay, phytosanitary clearance, and prompt container stuffing at Mundra Port (INMUN1) and Nhava Sheva (JNPT).`
+    );
+    setBroadcastLink('/products');
+    setBroadcastResult(null);
+    setTestResult(null);
+  };
+
+  const openBroadcastItem = (item) => {
+    setBroadcastTarget(item);
+    setBroadcastSubject(`🌟 Fresh Arrival Alert: ${item.name} (${item.categoryName || 'Export Commodity'})`);
+    setBroadcastHeading(`${item.name} — Fresh Export Harvest Ready for Booking`);
+    setBroadcastMessage(
+      `We are pleased to announce direct container allocation for "${item.name}".\n\n${item.shortDescription || 'Sortex cleaned export grade commodity with certified laboratory test reports.'}\n\n• Origin Hub: ${item.origin || 'Gujarat, India'}\n• Export Packaging: ${item.packageType || '25kg Paper / PP Bags'}\n• Minimum Order (MOQ): ${item.moq || '1 x 20ft FCL'}\n• Quality Guarantee: 100% Optical Sortex Graded & Laboratory Assay Verified\n\nDirect ocean freight booking and stuffing available for Mundra Port and JNPT Nhava Sheva.`
+    );
+    setBroadcastLink('/products');
+    setBroadcastResult(null);
+    setTestResult(null);
+  };
+
+  const handleSendBroadcast = async (e) => {
+    e.preventDefault();
+    if (!broadcastSubject.trim()) return;
+
+    try {
+      setSendingBroadcast(true);
+      setBroadcastResult(null);
+
+      const isSingleItem = broadcastTarget && typeof broadcastTarget === 'object';
+      const payload = {
+        subject: broadcastSubject.trim(),
+        message: broadcastMessage,
+        product: isSingleItem ? broadcastTarget : undefined,
+        products: !isSingleItem ? (current.items || []) : undefined,
+      };
+
+      const res = await api.post('/subscribers/broadcast-arrival', payload);
+      setBroadcastResult(res.data);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to dispatch broadcast: ' + err.message);
+    } finally {
+      setSendingBroadcast(false);
+    }
+  };
+
+  const handleSendTestEmail = async (e) => {
+    e.preventDefault();
+    if (!testEmailTarget.trim()) return;
+
+    try {
+      setSendingTest(true);
+      setTestResult(null);
+
+      const isSingleItem = broadcastTarget && typeof broadcastTarget === 'object';
+      const payload = {
+        subject: broadcastSubject.trim(),
+        message: broadcastMessage,
+        product: isSingleItem ? broadcastTarget : undefined,
+        products: !isSingleItem ? (current.items || []) : undefined,
+        testEmail: testEmailTarget.trim(),
+      };
+
+      const res = await api.post('/subscribers/broadcast-arrival', payload);
+      setTestResult(res.data);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to send test email.');
+    } finally {
+      setSendingTest(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header & Section Metadata */}
@@ -1599,14 +1759,24 @@ function NewArrivalsEditor({ section, setSection }) {
             <h3 className="font-display font-bold text-lg text-ink">Section Headline & Rotation</h3>
             <p className="text-xs text-ink/60">Controls the title, small category tag, badge, and carousel timer on the homepage.</p>
           </div>
-          <label className="flex items-center gap-2 text-xs font-semibold text-ink cursor-pointer bg-forest/5 px-3 py-1.5 rounded-full border border-forest/20">
-            <input
-              type="checkbox"
-              checked={current.isActive !== false}
-              onChange={(e) => updateField('isActive', e.target.checked)}
-            />
-            <span>Active on Homepage</span>
-          </label>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={openBroadcastAll}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-forest/30 bg-forest/5 px-3 py-1.5 text-xs font-bold text-forest transition hover:bg-forest hover:text-white shadow-xs"
+              title="Send an email announcement to all newsletter subscribers about all arrivals"
+            >
+              <span>📢</span> Broadcast All Arrivals to Subscribers
+            </button>
+            <label className="flex items-center gap-2 text-xs font-semibold text-ink cursor-pointer bg-forest/5 px-3 py-1.5 rounded-full border border-forest/20">
+              <input
+                type="checkbox"
+                checked={current.isActive !== false}
+                onChange={(e) => updateField('isActive', e.target.checked)}
+              />
+              <span>Active on Homepage</span>
+            </label>
+          </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -1684,14 +1854,27 @@ function NewArrivalsEditor({ section, setSection }) {
           {(current.items || []).map((item, i) => (
             <div key={item._id || i} className="rounded-xl border border-line bg-[#fbf9f4] p-5 shadow-sm">
               <div className="flex items-center justify-between border-b border-line pb-2 mb-3">
-                <span className="font-mono text-xs font-bold uppercase text-moss">Arrival Item #{i + 1}</span>
-                <button
-                  type="button"
-                  className="text-xs font-semibold text-clay hover:underline"
-                  onClick={() => removeItem(i)}
-                >
-                  Delete Item
-                </button>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-xs font-bold uppercase text-moss">Arrival Item #{i + 1}</span>
+                  <span className="font-display font-bold text-sm text-ink">{item.name}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => openBroadcastItem(item)}
+                    className="inline-flex items-center gap-1 rounded-lg border border-forest/30 bg-forest/10 px-2.5 py-1 text-xs font-bold text-forest transition hover:bg-forest hover:text-white"
+                    title="Send email broadcast to subscribers about this specific product"
+                  >
+                    <span>✉️</span> Mail Subscribers
+                  </button>
+                  <button
+                    type="button"
+                    className="text-xs font-semibold text-clay hover:underline ml-1"
+                    onClick={() => removeItem(i)}
+                  >
+                    Delete Item
+                  </button>
+                </div>
               </div>
 
               <div className="grid gap-3 sm:grid-cols-3">
@@ -1800,6 +1983,910 @@ function NewArrivalsEditor({ section, setSection }) {
           ))}
         </div>
       </div>
+
+      {/* Broadcast Modal for New Product Arrivals */}
+      {broadcastTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm overflow-y-auto">
+          <div className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl my-6 space-y-4">
+            {/* Product Photo & Specifications Preview Card */}
+            {typeof broadcastTarget === 'object' ? (
+              <div className="rounded-2xl border border-line bg-[#fbf9f4] p-4 space-y-3">
+                <div className="flex items-start gap-4">
+                  <div className="h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-white border border-line shadow-xs">
+                    {broadcastTarget.image ? (
+                      <img
+                        src={asset(broadcastTarget.image)}
+                        alt=""
+                        className="h-full w-full object-contain p-1"
+                      />
+                    ) : (
+                      <div className="grid h-full place-items-center text-[10px] text-ink/40">No photo</div>
+                    )}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-gold-dark bg-gold/15 px-2 py-0.5 rounded">
+                      {broadcastTarget.categoryName || 'FOOD COMMODITY'}
+                    </span>
+                    <h4 className="mt-1 font-display text-base font-bold text-ink">
+                      {broadcastTarget.name}
+                    </h4>
+                    <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[11px] text-ink/70">
+                      <span><strong>Origin:</strong> {broadcastTarget.origin || 'India'}</span>
+                      {broadcastTarget.packageType && <span><strong>Pack:</strong> {broadcastTarget.packageType}</span>}
+                      {broadcastTarget.moq && <span><strong>MOQ:</strong> {broadcastTarget.moq}</span>}
+                      {broadcastTarget.hsCode && <span><strong>HS:</strong> {broadcastTarget.hsCode}</span>}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-2.5 text-xs text-emerald-900 flex items-center gap-2">
+                  <span className="text-base">✨</span>
+                  <span>
+                    <strong>Complete Product Delivery:</strong> Subscribers will receive this exact product with its photo, specifications, and full description.
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-line bg-[#fbf9f4] p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs font-bold uppercase text-moss">
+                    All Seasonal Consignments ({(current.items || []).length} Products)
+                  </span>
+                  <span className="text-[11px] text-ink/50">Each item includes photo & specifications</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                  {(current.items || []).slice(0, 4).map((it, idx) => (
+                    <div key={idx} className="rounded-lg border border-line/60 bg-white p-2 text-center text-[11px]">
+                      <div className="h-10 w-full mb-1 flex items-center justify-center">
+                        {it.image ? (
+                          <img src={asset(it.image)} alt="" className="h-full object-contain" />
+                        ) : (
+                          <span className="text-[9px] text-ink/40">No photo</span>
+                        )}
+                      </div>
+                      <p className="font-bold text-ink truncate">{it.name}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={handleSendBroadcast} className="space-y-4">
+              <div>
+                <label className="label text-xs">Email Subject Line *</label>
+                <input
+                  required
+                  className="field text-sm"
+                  value={broadcastSubject}
+                  onChange={(e) => setBroadcastSubject(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="label text-xs">Main Email Headline</label>
+                <input
+                  className="field text-xs"
+                  value={broadcastHeading}
+                  onChange={(e) => setBroadcastHeading(e.target.value)}
+                  placeholder="Defaults to Subject Line if blank"
+                />
+              </div>
+
+              <div>
+                <label className="label text-xs">Announcement Message / Description</label>
+                <textarea
+                  className="field text-xs"
+                  rows="4"
+                  value={broadcastMessage}
+                  onChange={(e) => setBroadcastMessage(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="label text-xs">Website Action Link</label>
+                <input
+                  className="field text-xs font-mono"
+                  value={broadcastLink}
+                  onChange={(e) => setBroadcastLink(e.target.value)}
+                  placeholder="/products or /inquiry"
+                />
+              </div>
+
+              {/* Test Email */}
+              <div className="rounded-xl border border-amber-200 bg-amber-50/80 p-3 text-xs space-y-2">
+                <span className="font-bold text-amber-900 block">
+                  🧪 Send Test Email First (Verify Delivery):
+                </span>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    placeholder="Enter your email to test (e.g. yourname@gmail.com)…"
+                    value={testEmailTarget}
+                    onChange={(e) => setTestEmailTarget(e.target.value)}
+                    className="flex-1 rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-xs text-ink outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSendTestEmail}
+                    disabled={sendingTest || !testEmailTarget}
+                    className="rounded-lg bg-amber-700 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-amber-800 disabled:opacity-50 whitespace-nowrap shadow-sm transition"
+                  >
+                    {sendingTest ? 'Sending…' : 'Send Test Mail'}
+                  </button>
+                </div>
+
+                {testResult && (
+                  <div className="rounded-lg bg-white p-2 border border-amber-200 text-xs space-y-1">
+                    <p className="font-semibold text-emerald-800">✓ {testResult.message}</p>
+                    {testResult.previewUrl && (
+                      <div className="flex items-center justify-between pt-1">
+                        <span className="text-[11px] text-ink/60">Test preview link ready:</span>
+                        <a
+                          href={testResult.previewUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="rounded bg-amber-700 px-2 py-0.5 text-[11px] font-bold text-white hover:bg-amber-800 transition"
+                        >
+                          Open Preview ↗
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {broadcastResult && (
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-900 space-y-1">
+                  <p className="font-bold">✓ {broadcastResult.message}</p>
+                  {broadcastResult.previewUrl && (
+                    <a
+                      href={broadcastResult.previewUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-block mt-1 text-emerald-700 underline font-bold"
+                    >
+                      View Dispatched Email in Test Mailbox ↗
+                    </a>
+                  )}
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-line/60">
+                <button
+                  type="button"
+                  className="btn-outline text-xs"
+                  onClick={() => setBroadcastTarget(null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={sendingBroadcast || !broadcastSubject.trim()}
+                  className="rounded-xl bg-forest px-5 py-2 text-xs font-bold text-white shadow-md hover:bg-forest/90 disabled:opacity-50"
+                >
+                  {sendingBroadcast ? 'Dispatching Broadcast…' : '🚀 Send to All Subscribers'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ProductsPageEditor({ section, setSection, onSave, isSaving }) {
+  // Deep merge to ensure every sub-document has all default properties
+  const current = {
+    ...defaults.productsPage,
+    ...(section || {}),
+    hero: { ...defaults.productsPage.hero, ...(section?.hero || {}) },
+    showcase: { ...defaults.productsPage.showcase, ...(section?.showcase || {}) },
+    bento: {
+      ...defaults.productsPage.bento,
+      ...(section?.bento || {}),
+      bullets:
+        section?.bento?.bullets && section.bento.bullets.length > 0
+          ? section.bento.bullets
+          : defaults.productsPage.bento.bullets,
+    },
+    trustBar: {
+      ...defaults.productsPage.trustBar,
+      ...(section?.trustBar || {}),
+      items:
+        section?.trustBar?.items && section.trustBar.items.length > 0
+          ? section.trustBar.items
+          : defaults.productsPage.trustBar.items,
+    },
+    ctaBanner: { ...defaults.productsPage.ctaBanner, ...(section?.ctaBanner || {}) },
+  };
+
+  const updateHero = (field, value) => {
+    setSection({
+      ...current,
+      hero: { ...current.hero, [field]: value },
+    });
+  };
+
+  const updateShowcase = (field, value) => {
+    setSection({
+      ...current,
+      showcase: { ...current.showcase, [field]: value },
+    });
+  };
+
+  const updateBento = (field, value) => {
+    setSection({
+      ...current,
+      bento: { ...current.bento, [field]: value },
+    });
+  };
+
+  const updateBentoBullet = (index, value) => {
+    const nextBullets = [...(current.bento?.bullets || [])];
+    nextBullets[index] = value;
+    updateBento('bullets', nextBullets);
+  };
+
+  const addBentoBullet = () => {
+    updateBento('bullets', [...(current.bento?.bullets || []), 'New export feature highlight']);
+  };
+
+  const removeBentoBullet = (index) => {
+    updateBento('bullets', (current.bento?.bullets || []).filter((_, i) => i !== index));
+  };
+
+  const updateTrustPillar = (index, field, value) => {
+    const nextItems = [...(current.trustBar?.items || [])];
+    nextItems[index] = { ...nextItems[index], [field]: value };
+    setSection({
+      ...current,
+      trustBar: { ...current.trustBar, items: nextItems },
+    });
+  };
+
+  const updateCta = (field, value) => {
+    setSection({
+      ...current,
+      ctaBanner: { ...current.ctaBanner, [field]: value },
+    });
+  };
+
+  const handleResetDefaults = () => {
+    if (confirm('Reset Products Page CMS back to factory recommended defaults?')) {
+      setSection(JSON.parse(JSON.stringify(defaults.productsPage)));
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Top Action & Live Website Linking Header */}
+      <div className="rounded-2xl border border-line bg-gradient-to-r from-white via-[#fbf9f4] to-[#f7f3e8] p-5 shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-line/70 pb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-forest bg-forest/10 px-2.5 py-0.5 rounded border border-forest/20">
+                🛍️ LIVE PRODUCTS PAGE CMS
+              </span>
+              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-gold bg-gold/15 px-2 py-0.5 rounded">
+                WEBSITE CONNECTED
+              </span>
+            </div>
+            <h2 className="mt-1 font-display text-xl font-bold text-ink">
+              Products Catalogue & 3D Exhibition CMS
+            </h2>
+            <p className="mt-0.5 text-xs text-ink/65">
+              Live updates directly control the headlines, 3D Spin Wheel, Bento feature cards, trust assurance pillars, and quotation banners on the website.
+            </p>
+          </div>
+
+          {/* Quick Direct Save Action */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onSave}
+              disabled={isSaving}
+              className="rounded-xl bg-forest px-5 py-2.5 text-xs font-bold text-white shadow-md hover:bg-forest/90 disabled:opacity-50 flex items-center gap-1.5 transition"
+            >
+              <span>{isSaving ? '⏳ Saving…' : '💾 Save Products Page Changes'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Website Preview Links & Navigation Shortcuts */}
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs pt-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-mono text-[11px] font-bold text-ink/50 uppercase">Preview on Website:</span>
+            <a
+              href="/products"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 rounded-lg border border-forest/30 bg-white px-3 py-1 font-bold text-forest hover:bg-forest hover:text-white transition shadow-xs"
+            >
+              <span>👁️ View Live /products Page</span>
+              <span>↗</span>
+            </a>
+            <a
+              href="/product-details"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 rounded-lg border border-line bg-white px-3 py-1 font-semibold text-ink/75 hover:bg-line/20 hover:text-ink transition"
+            >
+              <span>👁️ View /product-details</span>
+              <span>↗</span>
+            </a>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <a
+              href="/admin/products"
+              className="inline-flex items-center gap-1 rounded-lg border border-line bg-white px-2.5 py-1 text-[11px] font-semibold text-ink/70 hover:bg-[#fbf9f4] hover:text-ink transition"
+            >
+              <span>📦 Manage Product Items</span>
+              <span>→</span>
+            </a>
+            <a
+              href="/admin/segments"
+              className="inline-flex items-center gap-1 rounded-lg border border-line bg-white px-2.5 py-1 text-[11px] font-semibold text-ink/70 hover:bg-[#fbf9f4] hover:text-ink transition"
+            >
+              <span>📂 Manage Categories</span>
+              <span>→</span>
+            </a>
+            <button
+              type="button"
+              onClick={handleResetDefaults}
+              className="text-[11px] text-clay/80 hover:text-clay hover:underline px-1.5"
+            >
+              Reset to Defaults
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 1. FEATURED FOOD SHOWCASE HEADER (MATCHING EXACT USER SCREENSHOT) */}
+      <section className="rounded-2xl border-2 border-emerald-600/30 bg-white p-6 shadow-card space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line pb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-forest bg-forest/10 px-2.5 py-0.5 rounded border border-forest/20">
+                ⭐ HERO EXHIBITION HEADER
+              </span>
+              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-gold bg-gold/15 px-2 py-0.5 rounded">
+                LIVE ON /products
+              </span>
+            </div>
+            <h2 className="mt-1 font-display text-xl font-bold text-ink">
+              1. "Featured Food Showcase" Section Header & 3D Exhibition
+            </h2>
+            <p className="text-xs text-ink/60">
+              Customize the exact headline, pill badge, descriptive text, and 3D wheel/arc settings shown at the top of the products page.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onSave}
+              disabled={isSaving}
+              className="rounded-xl bg-forest px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-forest/90 disabled:opacity-50 transition flex items-center gap-1.5"
+            >
+              <span>{isSaving ? 'Saving…' : '💾 Save Showcase'}</span>
+            </button>
+
+            <label className="flex items-center gap-2 text-xs font-semibold text-ink cursor-pointer bg-forest/5 px-3 py-1.5 rounded-full border border-forest/20">
+              <input
+                type="checkbox"
+                checked={current.showcase?.isActive !== false}
+                onChange={(e) => updateShowcase('isActive', e.target.checked)}
+              />
+              <span>Active</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Live Visual Preview Box (Exact Website Look) */}
+        <div className="rounded-2xl border border-line/80 bg-gradient-to-b from-[#fcfbfa] to-[#f7f4ed] p-6 text-center shadow-xs">
+          <div className="inline-flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-ink/50 bg-white px-2.5 py-0.5 rounded-full border border-line mb-3">
+            <span>👁️ Live Screen Preview:</span>
+          </div>
+
+          <div className="mx-auto max-w-2xl py-2 space-y-2">
+            {/* Top Eyebrow Badge Pill */}
+            <div className="inline-flex items-center gap-2 mb-1">
+              <span className="h-1.5 w-6 rounded-full bg-gold" />
+              <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#16382b]">
+                {current.showcase?.showcaseBadge || 'FEATURED FOOD SHOWCASE'}
+              </span>
+              <span className="h-1.5 w-6 rounded-full bg-gold" />
+            </div>
+
+            {/* Main Showcase Title */}
+            <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-[#16382b] transition-all">
+              {current.showcase?.title || 'Featured Export Products'}
+            </h2>
+
+            {/* Subtitle Description */}
+            <p className="text-xs sm:text-sm text-ink/75 max-w-xl mx-auto leading-relaxed">
+              {current.showcase?.subtitle ||
+                'Discover our certified Sortex-cleaned harvest lots and premium packaged Indian food products ready for global ocean freight.'}
+            </p>
+
+            {/* Mode & Watermark Pills */}
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-2 text-[11px] font-mono text-ink/60">
+              <span className="bg-white px-2.5 py-0.5 rounded-full border border-line">
+                Mode: {current.showcase?.defaultMode === 'arc' ? '🌸 Curved Fan Arc' : '🎡 3D Spin Wheel'}
+              </span>
+              <span className="bg-white px-2.5 py-0.5 rounded-full border border-line">
+                Speed: {current.showcase?.autoRotateSeconds || 3.5}s
+              </span>
+              <span className="bg-white px-2.5 py-0.5 rounded-full border border-line uppercase">
+                Watermark: {current.showcase?.watermark || 'FOOD PRODUCTS'}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Form Inputs for this Section */}
+        <div className="space-y-4 pt-1">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="label text-xs font-bold text-ink">
+                Showcase Top Badge Tag (Eyebrow Pill) *
+              </label>
+              <input
+                className="field text-xs font-semibold"
+                value={current.showcase?.showcaseBadge || ''}
+                onChange={(e) => updateShowcase('showcaseBadge', e.target.value)}
+                placeholder="e.g. FEATURED FOOD SHOWCASE"
+              />
+              <span className="text-[11px] text-ink/50 mt-1 block">
+                Displays between the two gold bars above the main heading.
+              </span>
+            </div>
+
+            <div>
+              <label className="label text-xs font-bold text-ink">
+                Showcase Main Headline / Title *
+              </label>
+              <input
+                className="field text-sm font-bold text-ink"
+                value={current.showcase?.title || ''}
+                onChange={(e) => updateShowcase('title', e.target.value)}
+                placeholder="e.g. Featured Export Products"
+              />
+              <span className="text-[11px] text-ink/50 mt-1 block">
+                Primary large heading of the 3D exhibition on the products page.
+              </span>
+            </div>
+          </div>
+
+          <div>
+            <label className="label text-xs font-bold text-ink">
+              Showcase Subtitle / Introduction Description *
+            </label>
+            <textarea
+              className="field text-xs leading-relaxed"
+              rows="3"
+              value={current.showcase?.subtitle || ''}
+              onChange={(e) => updateShowcase('subtitle', e.target.value)}
+              placeholder="Discover our certified Sortex-cleaned harvest lots and premium packaged Indian food products ready for global ocean freight."
+            />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-3 pt-2">
+            <div>
+              <label className="label text-xs">Default Display Mode</label>
+              <select
+                className="field text-xs font-semibold"
+                value={current.showcase?.defaultMode || 'wheel'}
+                onChange={(e) => updateShowcase('defaultMode', e.target.value)}
+              >
+                <option value="wheel">🎡 3D Spin Wheel (3 Products / Orbital)</option>
+                <option value="arc">🌸 Curved Fan Arc</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="label text-xs">Auto-Rotation Timer (Seconds)</label>
+              <input
+                type="number"
+                step="0.5"
+                min="2"
+                max="15"
+                className="field text-xs"
+                value={current.showcase?.autoRotateSeconds || 3.5}
+                onChange={(e) => updateShowcase('autoRotateSeconds', Number(e.target.value))}
+              />
+            </div>
+
+            <div>
+              <label className="label text-xs">Background Watermark Text</label>
+              <input
+                className="field font-mono text-xs uppercase"
+                value={current.showcase?.watermark || ''}
+                onChange={(e) => updateShowcase('watermark', e.target.value)}
+                placeholder="e.g. FOOD PRODUCTS"
+              />
+            </div>
+          </div>
+
+          <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-line/60">
+            <label className="flex items-center gap-2 text-xs font-medium text-ink cursor-pointer">
+              <input
+                type="checkbox"
+                checked={Boolean(current.showcase?.keepCustomTitle)}
+                onChange={(e) => updateShowcase('keepCustomTitle', e.target.checked)}
+              />
+              <span>
+                <strong>Retain Custom Heading:</strong> Keep "{current.showcase?.title || 'Featured Export Products'}" even when buyer selects a category pill
+              </span>
+            </label>
+
+            <button
+              type="button"
+              onClick={onSave}
+              disabled={isSaving}
+              className="btn-primary text-xs shrink-0"
+            >
+              {isSaving ? 'Saving…' : '💾 Save Showcase Changes'}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* 2. PRODUCT CATALOGUE GRID HEADER (LOWER GRID & /product-details) */}
+      <section className="rounded-2xl border border-line bg-white p-6 shadow-card space-y-4">
+        <div className="flex items-center justify-between border-b border-line pb-4">
+          <div>
+            <h2 className="font-display text-lg font-bold text-ink">
+              2. Product Catalogue Grid Header & Introduction
+            </h2>
+            <p className="text-xs text-ink/60">
+              Controls the title, badge, and descriptive introduction displayed above the product cards grid on the website.
+            </p>
+          </div>
+          <label className="flex items-center gap-2 text-xs font-semibold text-ink cursor-pointer bg-forest/5 px-3 py-1.5 rounded-full border border-forest/20">
+            <input
+              type="checkbox"
+              checked={current.isActive !== false}
+              onChange={(e) => setSection({ ...current, isActive: e.target.checked })}
+            />
+            <span>Active</span>
+          </label>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="label text-xs">Top Eyebrow Pill Tag</label>
+            <input
+              className="field"
+              value={current.hero?.eyebrow || ''}
+              onChange={(e) => updateHero('eyebrow', e.target.value)}
+              placeholder="e.g. CERTIFIED INDIAN EXPORTS"
+            />
+          </div>
+          <div>
+            <label className="label text-xs">Category Tag Badge</label>
+            <input
+              className="field"
+              value={current.hero?.badge || ''}
+              onChange={(e) => updateHero('badge', e.target.value)}
+              placeholder="e.g. Global Agro-Food Catalogue"
+            />
+          </div>
+        </div>
+
+        <div className="mt-2">
+          <label className="label text-xs">Main Catalogue Title Heading</label>
+          <input
+            className="field text-base font-bold"
+            value={current.hero?.title || ''}
+            onChange={(e) => updateHero('title', e.target.value)}
+            placeholder="e.g. All Export Food Products"
+          />
+        </div>
+
+        <div className="mt-2">
+          <label className="label text-xs">Catalogue Subtitle Description</label>
+          <textarea
+            className="field text-xs"
+            rows="2"
+            value={current.hero?.subtitle || ''}
+            onChange={(e) => updateHero('subtitle', e.target.value)}
+            placeholder="100% Sortex-cleaned Indian spices, premium grains, pulses..."
+          />
+        </div>
+      </section>
+
+      {/* 3. Bento Feature Card */}
+      <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+        <div className="border-b border-line pb-4 mb-4">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-gold-dark bg-gold/15 px-2 py-0.5 rounded">
+            PROMOTIONAL GRID CARD
+          </span>
+          <h2 className="mt-1 font-display text-lg font-bold text-ink">
+            3. Bento Highlight Card on Products Grid
+          </h2>
+          <p className="text-xs text-ink/60">
+            Featured wide banner card rendered inside the product cards grid highlighting verified trade assurance.
+          </p>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="label text-xs">Badge Tag</label>
+            <input
+              className="field text-xs"
+              value={current.bento?.badge || ''}
+              onChange={(e) => updateBento('badge', e.target.value)}
+              placeholder="e.g. DIRECT SOURCING GUARANTEE"
+            />
+          </div>
+          <div>
+            <label className="label text-xs">Card Headline</label>
+            <input
+              className="field text-sm font-bold"
+              value={current.bento?.headline || ''}
+              onChange={(e) => updateBento('headline', e.target.value)}
+              placeholder="e.g. Global Food Products, Perfected"
+            />
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <label className="label text-xs">Subtitle Description</label>
+          <textarea
+            className="field text-xs"
+            rows="2"
+            value={current.bento?.subtitle || ''}
+            onChange={(e) => updateBento('subtitle', e.target.value)}
+            placeholder="Direct sourcing of export-grade Indian spices..."
+          />
+        </div>
+
+        {/* Bullets List */}
+        <div className="mt-4 rounded-xl border border-line bg-[#fbf9f4] p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="font-mono text-xs font-bold uppercase text-ink">
+              Bullet Highlights ({(current.bento?.bullets || []).length})
+            </span>
+            <button
+              type="button"
+              onClick={addBentoBullet}
+              className="rounded-lg bg-white border border-line px-2.5 py-1 text-xs font-bold text-forest hover:bg-forest hover:text-white transition"
+            >
+              + Add Bullet
+            </button>
+          </div>
+
+          <div className="space-y-2">
+            {(current.bento?.bullets || []).map((bullet, idx) => (
+              <div key={idx} className="flex items-center gap-2">
+                <input
+                  className="field text-xs flex-1"
+                  value={bullet}
+                  onChange={(e) => updateBentoBullet(idx, e.target.value)}
+                  placeholder="e.g. Direct Mundra Port Container Stuffing"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeBentoBullet(idx)}
+                  className="text-xs text-clay hover:underline px-2"
+                >
+                  Delete
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 mt-4">
+          <div>
+            <label className="label text-xs">Call To Action Button Text</label>
+            <input
+              className="field text-xs"
+              value={current.bento?.buttonText || ''}
+              onChange={(e) => updateBento('buttonText', e.target.value)}
+              placeholder="e.g. Request Container Quotation"
+            />
+          </div>
+          <div>
+            <label className="label text-xs">Call To Action Button Link</label>
+            <input
+              className="field text-xs font-mono"
+              value={current.bento?.buttonLink || ''}
+              onChange={(e) => updateBento('buttonLink', e.target.value)}
+              placeholder="e.g. /inquiry"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Export Assurance & Trust Bar */}
+      <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+        <div className="flex items-center justify-between border-b border-line pb-4 mb-4">
+          <div>
+            <h2 className="font-display text-lg font-bold text-ink">
+              4. Export Assurance & Trust Highlights Bar
+            </h2>
+            <p className="text-xs text-ink/60">
+              4 key value pillars demonstrating Sortex optical cleaning, direct port logistics, and lab certifications.
+            </p>
+          </div>
+          <label className="flex items-center gap-2 text-xs font-semibold text-ink cursor-pointer bg-forest/5 px-3 py-1.5 rounded-full border border-forest/20">
+            <input
+              type="checkbox"
+              checked={current.trustBar?.isActive !== false}
+              onChange={(e) =>
+                setSection({
+                  ...current,
+                  trustBar: { ...current.trustBar, isActive: e.target.checked },
+                })
+              }
+            />
+            <span>Active</span>
+          </label>
+        </div>
+
+        <div className="mb-4">
+          <label className="label text-xs">Trust Bar Section Title</label>
+          <input
+            className="field"
+            value={current.trustBar?.title || ''}
+            onChange={(e) =>
+              setSection({
+                ...current,
+                trustBar: { ...current.trustBar, title: e.target.value },
+              })
+            }
+            placeholder="e.g. Why Global Buyers Trust NMC"
+          />
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {(current.trustBar?.items || []).map((pillar, i) => (
+            <div key={pillar._id || i} className="rounded-xl border border-line bg-[#fbf9f4] p-4 space-y-2">
+              <div className="flex items-center gap-2">
+                <input
+                  className="w-12 text-center text-lg rounded border border-line bg-white py-1"
+                  value={pillar.icon || '✨'}
+                  onChange={(e) => updateTrustPillar(i, 'icon', e.target.value)}
+                  placeholder="Icon"
+                />
+                <input
+                  className="field text-xs font-bold flex-1"
+                  value={pillar.title || ''}
+                  onChange={(e) => updateTrustPillar(i, 'title', e.target.value)}
+                  placeholder="Pillar Title (e.g. 100% Sortex Cleaned)"
+                />
+              </div>
+              <textarea
+                className="field text-xs"
+                rows="2"
+                value={pillar.text || ''}
+                onChange={(e) => updateTrustPillar(i, 'text', e.target.value)}
+                placeholder="Brief description of this export guarantee..."
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 5. Bottom Quotation & Sample Banner */}
+      <section className="rounded-2xl border border-line bg-white p-6 shadow-card">
+        <div className="flex items-center justify-between border-b border-line pb-4 mb-4">
+          <div>
+            <h2 className="font-display text-lg font-bold text-ink">
+              5. Bottom Export Quotation & Sample CTA Banner
+            </h2>
+            <p className="text-xs text-ink/60">
+              High-converting call to action banner positioned at the bottom of the products page.
+            </p>
+          </div>
+          <label className="flex items-center gap-2 text-xs font-semibold text-ink cursor-pointer bg-forest/5 px-3 py-1.5 rounded-full border border-forest/20">
+            <input
+              type="checkbox"
+              checked={current.ctaBanner?.isActive !== false}
+              onChange={(e) => updateCta('isActive', e.target.checked)}
+            />
+            <span>Active</span>
+          </label>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="label text-xs">Banner Eyebrow Tag</label>
+            <input
+              className="field text-xs"
+              value={current.ctaBanner?.eyebrow || ''}
+              onChange={(e) => updateCta('eyebrow', e.target.value)}
+              placeholder="e.g. READY FOR EXPORT ORDERS"
+            />
+          </div>
+          <div>
+            <label className="label text-xs">Banner Main Title</label>
+            <input
+              className="field text-sm font-bold"
+              value={current.ctaBanner?.title || ''}
+              onChange={(e) => updateCta('title', e.target.value)}
+              placeholder="e.g. Need Container Freight Quotations or Custom Samples?"
+            />
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <label className="label text-xs">Banner Description</label>
+          <textarea
+            className="field text-xs"
+            rows="2"
+            value={current.ctaBanner?.description || ''}
+            onChange={(e) => updateCta('description', e.target.value)}
+            placeholder="Our international trade desk prepares formal FOB..."
+          />
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 mt-4">
+          <div>
+            <label className="label text-xs">Primary Button Text</label>
+            <input
+              className="field text-xs"
+              value={current.ctaBanner?.buttonPrimaryText || ''}
+              onChange={(e) => updateCta('buttonPrimaryText', e.target.value)}
+              placeholder="Request Official Quotation →"
+            />
+          </div>
+          <div>
+            <label className="label text-xs">Primary Button Link</label>
+            <input
+              className="field text-xs font-mono"
+              value={current.ctaBanner?.buttonPrimaryLink || ''}
+              onChange={(e) => updateCta('buttonPrimaryLink', e.target.value)}
+              placeholder="/inquiry"
+            />
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 mt-4">
+          <div>
+            <label className="label text-xs">Secondary Button Text</label>
+            <input
+              className="field text-xs"
+              value={current.ctaBanner?.buttonSecondaryText || ''}
+              onChange={(e) => updateCta('buttonSecondaryText', e.target.value)}
+              placeholder="Download Product Brochures"
+            />
+          </div>
+          <div>
+            <label className="label text-xs">Secondary Button Link</label>
+            <input
+              className="field text-xs font-mono"
+              value={current.ctaBanner?.buttonSecondaryLink || ''}
+              onChange={(e) => updateCta('buttonSecondaryLink', e.target.value)}
+              placeholder="/brochures"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Bottom Sticky-style Save Action Bar */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border border-line bg-white p-5 shadow-card">
+        <div>
+          <h4 className="font-display font-bold text-sm text-ink">Ready to Publish Changes?</h4>
+          <p className="text-xs text-ink/60">
+            Saving here updates MongoDB and instantly connects changes to <span className="font-mono text-moss">/products</span> and <span className="font-mono text-moss">/product-details</span>.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={onSave}
+          disabled={isSaving}
+          className="rounded-xl bg-forest px-6 py-2.5 text-xs font-bold text-white shadow-md hover:bg-forest/90 disabled:opacity-50 flex items-center gap-2 transition"
+        >
+          <span>{isSaving ? 'Saving Changes…' : '💾 Save All Products Page Changes'}</span>
+        </button>
+      </div>
     </div>
   );
 }
@@ -1878,6 +2965,7 @@ export default function ManageSiteContent() {
       group: 'Site Pages',
       icon: '📄',
       items: [
+        { id: 'products_page', label: 'Products Page CMS', icon: '🛍️', badge: 'Editable' },
         { id: 'about', label: 'About Us Page Content', icon: '🏢' },
         { id: 'inquiry', label: 'Inquiry & Quote Header', icon: '✉️' },
       ],
@@ -2081,6 +3169,16 @@ export default function ManageSiteContent() {
               </div>
               <ItemEditor section={content.testimonials} setSection={(v) => setSection('testimonials', v)} image />
             </section>
+          )}
+
+          {/* PRODUCTS PAGE CMS */}
+          {tab === 'products_page' && (
+            <ProductsPageEditor
+              section={content.productsPage}
+              setSection={(v) => setSection('productsPage', v)}
+              onSave={save}
+              isSaving={busy}
+            />
           )}
 
           {/* 9. ABOUT PAGE */}

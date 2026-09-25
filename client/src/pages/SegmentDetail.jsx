@@ -12,8 +12,13 @@ export default function SegmentDetail() {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [data, setData] = useState(null);
+  const [siteContent, setSiteContent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    api.get('/site-content').then((r) => setSiteContent(r.data)).catch(() => {});
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -153,6 +158,101 @@ export default function SegmentDetail() {
             </div>
           )}
         </section>
+      )}
+
+      {/* Trust Pillars Bar */}
+      {siteContent?.productsPage?.trustBar?.isActive !== false && (
+        <div className="container-x pb-12">
+          <section className="rounded-3xl border border-line/70 bg-gradient-to-br from-white/95 via-[#fcfbfa] to-[#f7f4ed] p-6 sm:p-10 shadow-sm">
+            <div className="text-center max-w-xl mx-auto mb-8">
+              <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-gold">NMC ASSURANCE</span>
+              <h3 className="mt-1 font-display text-xl sm:text-2xl font-bold text-ink">
+                {siteContent?.productsPage?.trustBar?.title || 'Why Global Buyers Trust Nirmala Multi Trading Co.'}
+              </h3>
+            </div>
+
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {(siteContent?.productsPage?.trustBar?.items && siteContent.productsPage.trustBar.items.length > 0
+                ? siteContent.productsPage.trustBar.items
+                : [
+                    {
+                      icon: '🔍',
+                      title: '100% Sortex Optical Cleaning',
+                      text: 'Laser graded to 99.5% European purity with zero foreign contaminants.',
+                    },
+                    {
+                      icon: '🚢',
+                      title: 'Port-Direct Logistics',
+                      text: 'Express sailings from Mundra Port and JNPT Nhava Sheva to worldwide ports.',
+                    },
+                    {
+                      icon: '📜',
+                      title: 'Phyto & MRL Compliance',
+                      text: 'Pre-shipment phytosanitary and aflatoxin lab assays with every container.',
+                    },
+                    {
+                      icon: '📦',
+                      title: 'Custom Packaging & Branding',
+                      text: 'From 25kg multi-wall paper bags to buyer-branded retail standup pouches.',
+                    },
+                  ]
+              ).map((pillar, idx) => (
+                <div
+                  key={pillar._id || idx}
+                  className="group relative rounded-2xl border border-line/60 bg-white p-5 shadow-xs transition duration-300 hover:border-gold/60 hover:shadow-md"
+                >
+                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-forest/5 text-xl transition-transform duration-300 group-hover:scale-110">
+                    {pillar.icon || '✨'}
+                  </div>
+                  <h4 className="font-display text-sm font-bold text-ink">
+                    {pillar.title}
+                  </h4>
+                  <p className="mt-1 text-xs text-ink/70 leading-relaxed">
+                    {pillar.text}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      )}
+
+      {/* Container Export Quotation CTA Banner */}
+      {siteContent?.productsPage?.ctaBanner?.isActive !== false && (
+        <div className="container-x pb-16">
+          <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0c241b] via-[#16382b] to-[#1f4e3c] p-8 sm:p-12 text-white shadow-xl border border-gold/40">
+            <div className="pointer-events-none absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-gold/15 blur-3xl" />
+            <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl" />
+
+            <div className="relative z-10 max-w-2xl">
+              <span className="font-mono text-xs font-bold uppercase tracking-widest text-gold">
+                {siteContent?.productsPage?.ctaBanner?.eyebrow || 'READY FOR EXPORT ORDERS'}
+              </span>
+              <h3 className="mt-2 font-display text-2xl sm:text-4xl font-black leading-tight text-paper">
+                {siteContent?.productsPage?.ctaBanner?.title || 'Need Container Freight Quotations or Custom Samples?'}
+              </h3>
+              <p className="mt-3 text-xs sm:text-sm text-paper/85 leading-relaxed">
+                {siteContent?.productsPage?.ctaBanner?.description ||
+                  'Our international trade desk prepares formal FOB (Mundra/JNPT) or CIF proforma invoices within 12–24 business hours. Courier sample kits dispatched worldwide.'}
+              </p>
+
+              <div className="mt-7 flex flex-wrap items-center gap-3">
+                <Link
+                  to={siteContent?.productsPage?.ctaBanner?.buttonPrimaryLink || '/inquiry'}
+                  className="rounded-full bg-gold px-6 py-3 text-xs font-bold text-ink shadow-md transition hover:bg-gold/90 hover:scale-105"
+                >
+                  {siteContent?.productsPage?.ctaBanner?.buttonPrimaryText || 'Request Official Quotation →'}
+                </Link>
+                <Link
+                  to={siteContent?.productsPage?.ctaBanner?.buttonSecondaryLink || '/brochures'}
+                  className="rounded-full border border-white/30 bg-white/10 px-5 py-3 text-xs font-semibold text-white transition hover:bg-white/20"
+                >
+                  {siteContent?.productsPage?.ctaBanner?.buttonSecondaryText || 'Download Product Brochures'} 📄
+                </Link>
+              </div>
+            </div>
+          </section>
+        </div>
       )}
     </div>
   );
