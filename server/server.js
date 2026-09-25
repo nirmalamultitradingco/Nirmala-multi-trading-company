@@ -114,19 +114,16 @@ app.get('/api/health', (req, res) => {
 /*
  * Connect MongoDB before API requests.
  */
-let dbPromise;
-
 app.use('/api', async (req, res, next) => {
   try {
-    if (!dbPromise) {
-      dbPromise = connectDB();
-    }
-
-    await dbPromise;
+    await connectDB();
     next();
   } catch (error) {
-    console.error('MongoDB connection failed:', error);
-    next(error);
+    console.error('MongoDB connection error in API route:', error.message);
+    res.status(500).json({
+      message: 'Database connection failed. Please ensure MONGO_URI is set correctly in environment variables.',
+      error: error.message,
+    });
   }
 });
 
@@ -152,7 +149,7 @@ app.use(errorHandler);
  */
 const PORT = process.env.PORT || 5000;
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`API running on http://localhost:${PORT}`);
   });
