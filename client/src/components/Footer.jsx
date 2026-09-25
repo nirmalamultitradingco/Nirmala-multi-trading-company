@@ -19,7 +19,11 @@ export default function Footer() {
 
     try {
       const res = await api.post('/subscribers', { email: email.trim(), source: 'footer' });
-      setStatus({ type: 'success', message: res.data?.message || 'Subscribed successfully!' });
+      setStatus({
+        type: 'success',
+        message: res.data?.message || 'Subscribed successfully! Confirmation email dispatched.',
+        previewUrl: res.data?.previewUrl,
+      });
       setEmail('');
     } catch (err) {
       setStatus({
@@ -76,13 +80,25 @@ export default function Footer() {
               </div>
 
               {status.message && (
-                <p
-                  className={`mt-2.5 text-xs font-medium ${
-                    status.type === 'success' ? 'text-emerald-400' : 'text-rose-400'
-                  }`}
-                >
-                  {status.message}
-                </p>
+                <div className="mt-2.5 space-y-1">
+                  <p
+                    className={`text-xs font-medium ${
+                      status.type === 'success' ? 'text-emerald-400' : 'text-rose-400'
+                    }`}
+                  >
+                    {status.message}
+                  </p>
+                  {status.previewUrl && (
+                    <a
+                      href={status.previewUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-block text-[11px] text-gold underline hover:text-white transition"
+                    >
+                      🔗 View Delivered Email in Test Mailbox ↗
+                    </a>
+                  )}
+                </div>
               )}
             </form>
           </div>

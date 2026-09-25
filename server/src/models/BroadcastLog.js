@@ -31,6 +31,23 @@ const broadcastLogSchema = new mongoose.Schema(
       type: String,
       default: 'sent',
     },
+    deliveryMode: {
+      type: String,
+      enum: ['live_smtp', 'test_preview'],
+      default: 'live_smtp',
+    },
+    previewUrl: {
+      type: String,
+      default: '',
+    },
+    failedCount: {
+      type: Number,
+      default: 0,
+    },
+    failedEmails: {
+      type: [String],
+      default: [],
+    },
     sentAt: {
       type: Date,
       default: Date.now,
@@ -40,3 +57,4 @@ const broadcastLogSchema = new mongoose.Schema(
 );
 
 export default mongoose.model('BroadcastLog', broadcastLogSchema);
+

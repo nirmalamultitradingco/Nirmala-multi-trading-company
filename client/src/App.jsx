@@ -15,6 +15,7 @@ import About from './pages/About.jsx';
 import Inquiry from './pages/Inquiry.jsx';
 import News from './pages/News.jsx';
 import NewsDetail from './pages/NewsDetail.jsx';
+import Unsubscribe from './pages/Unsubscribe.jsx';
 import NotFound from './pages/NotFound.jsx';
 
 import Login from './pages/admin/Login.jsx';
@@ -88,6 +89,7 @@ export default function App() {
         <Route path="about" element={<About />} />
         <Route path="inquiry" element={<Inquiry />} />
         <Route path="inquiry/:productSlug" element={<Inquiry />} />
+        <Route path="unsubscribe" element={<Unsubscribe />} />
       </Route>
 
       {/* Admin */}

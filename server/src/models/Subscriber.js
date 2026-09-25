@@ -22,6 +22,9 @@ const subscriberSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    unsubscribedAt: {
+      type: Date,
+    },
   },
   { timestamps: true }
 );

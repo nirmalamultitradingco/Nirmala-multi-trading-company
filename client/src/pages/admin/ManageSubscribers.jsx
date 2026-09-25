@@ -13,14 +13,20 @@ export default function ManageSubscribers() {
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
+  // SMTP status
+  const [smtpStatus, setSmtpStatus] = useState(null);
+  const [showSmtpGuide, setShowSmtpGuide] = useState(false);
+
   // Broadcast modal state
   const [showBroadcastModal, setShowBroadcastModal] = useState(false);
   const [broadcastForm, setBroadcastForm] = useState({ subject: '', message: '', link: '' });
   const [sendingBroadcast, setSendingBroadcast] = useState(false);
+  const [broadcastResult, setBroadcastResult] = useState(null);
 
   // Test email state
   const [testEmailTarget, setTestEmailTarget] = useState('');
   const [sendingTest, setSendingTest] = useState(false);
+  const [testResult, setTestResult] = useState(null);
 
   // View broadcast detail modal
   const [selectedLog, setSelectedLog] = useState(null);
@@ -29,14 +35,16 @@ export default function ManageSubscribers() {
     try {
       setLoading(true);
       setError('');
-      const [subsRes, logsRes] = await Promise.all([
+      const [subsRes, logsRes, smtpRes] = await Promise.all([
         api.get('/subscribers', { params: { search: search.trim() || undefined } }),
         api.get('/subscribers/broadcasts').catch(() => ({ data: [] })),
+        api.get('/subscribers/smtp-status').catch(() => ({ data: null })),
       ]);
       setSubscribers(subsRes.data.subscribers || []);
       setTotalCount(subsRes.data.totalCount || 0);
       setActiveCount(subsRes.data.activeCount || 0);
       setBroadcastLogs(logsRes.data || []);
+      if (smtpRes?.data) setSmtpStatus(smtpRes.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load subscribers.');
     } finally {
@@ -66,11 +74,10 @@ export default function ManageSubscribers() {
 
     try {
       setSendingBroadcast(true);
+      setBroadcastResult(null);
       const res = await api.post('/subscribers/broadcast', broadcastForm);
+      setBroadcastResult(res.data);
       setSuccessMsg(res.data?.message || 'Broadcast announcement successfully dispatched!');
-      setTimeout(() => setSuccessMsg(''), 5000);
-      setShowBroadcastModal(false);
-      setBroadcastForm({ subject: '', message: '', link: '' });
       fetchSubscribers();
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to send broadcast.');
@@ -85,17 +92,45 @@ export default function ManageSubscribers() {
 
     try {
       setSendingTest(true);
+      setTestResult(null);
       const res = await api.post('/subscribers/test-email', {
         email: testEmailTarget.trim(),
         subject: broadcastForm.subject.trim() || 'NMC Exporter Intelligence Update',
-        message: broadcastForm.message.trim() || 'This is a test notification from the Nirmala Multi Trading Co. admin workspace.',
+        message:
+          broadcastForm.message.trim() ||
+          'This is a test notification from the Nirmala Multi Trading Co. admin workspace.',
         link: broadcastForm.link.trim() || '/products',
       });
-      alert(res.data?.message || `Test email dispatched to ${testEmailTarget}`);
+      setTestResult(res.data);
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to send test email.');
     } finally {
       setSendingTest(false);
+    }
+  };
+
+  const applyTemplate = (type) => {
+    if (type === 'harvest') {
+      setBroadcastForm({
+        subject: '🌾 Fresh Harvest Alert: Gujarat Cumin & Sesame Lots Available',
+        message:
+          'We have commenced procurement of the new seasonal crop from farm clusters across Gujarat & Rajasthan.\n\n• Sortex Laser Graded: 99% & 99.5% European purity\n• Low moisture content (< 8.0%), aflatoxin compliant\n• Available in 25kg / 50kg multi-wall paper & PP packaging\n• Prompt 20ft & 40ft container stuffing at Mundra Port (INMUN1)',
+        link: '/products',
+      });
+    } else if (type === 'freight') {
+      setBroadcastForm({
+        subject: '🚢 Ocean Container Freight Allocation: Mundra & JNPT Direct Sailings',
+        message:
+          'Special containerized ocean freight allocation available for immediate bookings:\n\n• Mundra to Jebel Ali / Dammam / Doha (Direct 3-5 days transit)\n• Mundra to Rotterdam / Hamburg / Felixstowe (Direct ocean line 18-24 days)\n• Commodities: Basmati Rice, Cumin Seeds, Turmeric, Dehydrated Onion Flakes\n• Available in FOB, CIF, or CFR incoterms.',
+        link: '/inquiry',
+      });
+    } else if (type === 'catalog') {
+      setBroadcastForm({
+        subject: '📦 New Export Catalogue & Sortex Specification Release 2026',
+        message:
+          'We have updated our export commodity catalogue with comprehensive laboratory test certificates, MRL thresholds, and container stuffing specifications.\n\nBrowse full technical brochures and request formal FOB/CIF proforma quotations directly online.',
+        link: '/brochures',
+      });
     }
   };
 
@@ -109,7 +144,8 @@ export default function ManageSubscribers() {
     if (!subscribers.length) return;
     const headers = ['Email,Status,SubscribedAt,Source'];
     const rows = subscribers.map(
-      (s) => `"${s.email}","${s.status}","${new Date(s.subscribedAt).toISOString()}","${s.source || 'footer'}"`
+      (s) =>
+        `"${s.email}","${s.status}","${new Date(s.subscribedAt).toISOString()}","${s.source || 'footer'}"`
     );
     const csvContent = 'data:text/csv;charset=utf-8,' + [headers, ...rows].join('\n');
     const encodedUri = encodeURI(csvContent);
@@ -129,7 +165,7 @@ export default function ManageSubscribers() {
           <p className="eyebrow font-mono text-gold">AUDIENCE & NEWSLETTER</p>
           <h1 className="mt-1 font-display text-3xl font-extrabold text-ink">Subscribers</h1>
           <p className="mt-1 text-sm text-ink/60">
-            View all subscribed buyers and automatically notify them when new products or blogs are added.
+            Manage subscribed global buyers, verify live email delivery, and dispatch broadcast announcements.
           </p>
         </div>
 
@@ -144,7 +180,11 @@ export default function ManageSubscribers() {
           </button>
           <button
             type="button"
-            onClick={() => setShowBroadcastModal(true)}
+            onClick={() => {
+              setBroadcastResult(null);
+              setTestResult(null);
+              setShowBroadcastModal(true);
+            }}
             className="inline-flex items-center gap-1.5 rounded-xl bg-forest px-4 py-2.5 text-xs font-bold text-white shadow-md transition hover:bg-forest/90"
           >
             <span>📢</span> Send Broadcast Announcement
@@ -152,10 +192,111 @@ export default function ManageSubscribers() {
         </div>
       </div>
 
+      {/* SMTP Live Delivery Status Banner */}
+      <div
+        className={`rounded-2xl border p-4 sm:p-5 transition-all shadow-sm ${
+          smtpStatus?.isConfigured
+            ? 'border-emerald-200 bg-emerald-50/70 text-emerald-900'
+            : 'border-amber-200 bg-amber-50/80 text-amber-900'
+        }`}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-start sm:items-center gap-3">
+            <span className="text-2xl shrink-0">
+              {smtpStatus?.isConfigured ? '🟢' : '🟡'}
+            </span>
+            <div>
+              <div className="flex items-center gap-2">
+                <strong className="text-sm font-bold">
+                  {smtpStatus?.isConfigured
+                    ? 'SMTP Live Email Sending Active'
+                    : 'Email System: Test Preview Mode Active (Ethereal)'}
+                </strong>
+                <span
+                  className={`rounded-full px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider ${
+                    smtpStatus?.isConfigured
+                      ? 'bg-emerald-200 text-emerald-800'
+                      : 'bg-amber-200 text-amber-800'
+                  }`}
+                >
+                  {smtpStatus?.mode || 'Active'}
+                </span>
+              </div>
+              <p className="mt-1 text-xs opacity-85 leading-relaxed">
+                {smtpStatus?.isConfigured
+                  ? `Emails are dispatched live via SMTP Host: ${smtpStatus.host} (${smtpStatus.user}) • Sender: "${smtpStatus.from}"`
+                  : 'Live SMTP credentials are not yet configured in server/.env. Test mailbox is running — all subscriber emails and broadcasts generate live clickable web preview links.'}
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowSmtpGuide(!showSmtpGuide)}
+            className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-bold transition shadow-sm border ${
+              smtpStatus?.isConfigured
+                ? 'bg-white text-emerald-800 border-emerald-300 hover:bg-emerald-100/50'
+                : 'bg-amber-700 text-white border-amber-800 hover:bg-amber-800'
+            }`}
+          >
+            {showSmtpGuide ? 'Hide Setup Guide ✕' : '⚙️ SMTP Configuration Guide'}
+          </button>
+        </div>
+
+        {/* Collapsible SMTP Guide */}
+        {showSmtpGuide && (
+          <div className="mt-4 rounded-xl border border-black/10 bg-white/90 p-4 text-xs space-y-3 text-ink">
+            <h4 className="font-bold text-sm text-ink">
+              How to configure live email delivery in <code className="font-mono text-forest">server/.env</code>:
+            </h4>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-lg bg-stone-50 p-3 border border-stone-200">
+                <strong className="block text-ink font-semibold mb-1">Option A: Gmail SMTP (Recommended)</strong>
+                <p className="text-ink/70 text-[11px] mb-2 leading-relaxed">
+                  1. In your Google Account, enable 2-Step Verification.<br/>
+                  2. Generate an <strong>App Password</strong> (Security → App Passwords).<br/>
+                  3. Paste the following in <code className="font-mono">server/.env</code>:
+                </p>
+                <pre className="rounded bg-ink p-2 text-[11px] text-paper font-mono overflow-x-auto">
+{`SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=nirmalamultitradingco@gmail.com
+SMTP_PASS=your-16-char-app-password
+MAIL_FROM="Nirmala Multi Trading Co. <nirmalamultitradingco@gmail.com>"`}
+                </pre>
+              </div>
+
+              <div className="rounded-lg bg-stone-50 p-3 border border-stone-200">
+                <strong className="block text-ink font-semibold mb-1">Option B: Custom SMTP / Brevo / SendGrid</strong>
+                <p className="text-ink/70 text-[11px] mb-2 leading-relaxed">
+                  Provide your company SMTP server host and port:
+                </p>
+                <pre className="rounded bg-ink p-2 text-[11px] text-paper font-mono overflow-x-auto">
+{`SMTP_HOST=smtp-relay.brevo.com
+SMTP_PORT=587
+SMTP_USER=your-smtp-username
+SMTP_PASS=your-smtp-password
+MAIL_FROM="Nirmala Multi Trading Co. <sales@nmc.com>"`}
+                </pre>
+              </div>
+            </div>
+            <p className="text-[11px] text-ink/60">
+              * Note: Restart the server after updating <code className="font-mono font-bold">server/.env</code> to load new credentials.
+            </p>
+          </div>
+        )}
+      </div>
+
       {successMsg && (
         <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 shadow-sm flex items-center justify-between">
           <span>✓ {successMsg}</span>
-          <button type="button" onClick={() => setSuccessMsg('')} className="text-emerald-600 hover:text-emerald-900 font-bold">✕</button>
+          <button
+            type="button"
+            onClick={() => setSuccessMsg('')}
+            className="text-emerald-600 hover:text-emerald-900 font-bold"
+          >
+            ✕
+          </button>
         </div>
       )}
 
@@ -185,7 +326,7 @@ export default function ManageSubscribers() {
             <span className="text-xl">🚀</span>
           </div>
           <p className="mt-2 font-display text-3xl font-extrabold text-ink">{broadcastLogs.length}</p>
-          <span className="mt-1 inline-block text-xs text-ink/50">Dispatched alerts</span>
+          <span className="mt-1 inline-block text-xs text-ink/50">Total notification logs</span>
         </div>
       </div>
 
@@ -214,7 +355,7 @@ export default function ManageSubscribers() {
         </div>
       </div>
 
-      {/* Subscribers Table (Showing every email address with copy action) */}
+      {/* Subscribers Table */}
       <div className="rounded-2xl border border-line bg-white shadow-sm overflow-hidden">
         <div className="border-b border-line px-6 py-4 flex items-center justify-between">
           <h2 className="font-display text-base font-bold text-ink">
@@ -224,14 +365,20 @@ export default function ManageSubscribers() {
         </div>
 
         {loading ? (
-          <div className="py-16"><Loader /></div>
+          <div className="py-16">
+            <Loader />
+          </div>
         ) : error ? (
           <div className="p-8 text-center text-sm text-rose-600">{error}</div>
         ) : subscribers.length === 0 ? (
           <div className="py-12">
             <EmptyState
               title={search ? 'No matching subscribers found' : 'No subscribers yet'}
-              hint={search ? 'Try clearing your search term.' : 'Subscribers from the public website footer will show up here.'}
+              hint={
+                search
+                  ? 'Try clearing your search term.'
+                  : 'Subscribers from the public website footer will show up here.'
+              }
             />
           </div>
         ) : (
@@ -263,12 +410,18 @@ export default function ManageSubscribers() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        s.status === 'active'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-stone-100 text-stone-600 border border-stone-200'
-                      }`}>
-                        <span className={`h-1.5 w-1.5 rounded-full ${s.status === 'active' ? 'bg-emerald-500' : 'bg-stone-400'}`} />
+                      <span
+                        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                          s.status === 'active'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : 'bg-stone-100 text-stone-600 border border-stone-200'
+                        }`}
+                      >
+                        <span
+                          className={`h-1.5 w-1.5 rounded-full ${
+                            s.status === 'active' ? 'bg-emerald-500' : 'bg-stone-400'
+                          }`}
+                        />
                         {s.status === 'active' ? 'Active' : 'Unsubscribed'}
                       </span>
                     </td>
@@ -301,7 +454,7 @@ export default function ManageSubscribers() {
           <div>
             <h2 className="font-display text-base font-bold text-ink">Broadcast & Notification History</h2>
             <p className="text-xs text-ink/50 mt-0.5">
-              Every dispatched email notification. Click "View Recipients" to see the emails.
+              Every dispatched email notification. Click "View Recipients" to see subscriber details.
             </p>
           </div>
           <span className="rounded-full bg-forest/10 px-2.5 py-1 text-xs font-mono font-bold text-forest">
@@ -321,21 +474,24 @@ export default function ManageSubscribers() {
                   <th className="px-6 py-3">Type</th>
                   <th className="px-6 py-3">Subject</th>
                   <th className="px-6 py-3">Recipients</th>
+                  <th className="px-6 py-3">Delivery Mode</th>
                   <th className="px-6 py-3">Date Dispatched</th>
-                  <th className="px-6 py-3 text-right">Email Details</th>
+                  <th className="px-6 py-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
                 {broadcastLogs.map((log) => (
                   <tr key={log._id} className="hover:bg-[#fbf9f4]/60 transition">
                     <td className="px-6 py-3.5">
-                      <span className={`inline-block rounded-md px-2 py-0.5 text-[11px] font-mono font-bold uppercase ${
-                        log.type === 'blog'
-                          ? 'bg-amber-100 text-amber-800'
-                          : log.type === 'product'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-purple-100 text-purple-800'
-                      }`}>
+                      <span
+                        className={`inline-block rounded-md px-2 py-0.5 text-[11px] font-mono font-bold uppercase ${
+                          log.type === 'blog'
+                            ? 'bg-amber-100 text-amber-800'
+                            : log.type === 'product'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-purple-100 text-purple-800'
+                        }`}
+                      >
                         {log.type}
                       </span>
                     </td>
@@ -345,10 +501,31 @@ export default function ManageSubscribers() {
                     <td className="px-6 py-3.5 font-mono text-xs text-ink/70">
                       {log.recipientCount} subscriber(s)
                     </td>
+                    <td className="px-6 py-3.5">
+                      <span
+                        className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-[11px] font-mono font-bold ${
+                          log.deliveryMode === 'test_preview'
+                            ? 'bg-amber-100 text-amber-800'
+                            : 'bg-emerald-100 text-emerald-800'
+                        }`}
+                      >
+                        {log.deliveryMode === 'test_preview' ? '🟡 Test Preview' : '🟢 Live SMTP'}
+                      </span>
+                    </td>
                     <td className="px-6 py-3.5 text-xs font-mono text-ink/50">
                       {new Date(log.sentAt).toLocaleString()}
                     </td>
-                    <td className="px-6 py-3.5 text-right">
+                    <td className="px-6 py-3.5 text-right space-x-2">
+                      {log.previewUrl && (
+                        <a
+                          href={log.previewUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="rounded-lg bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-1 text-xs font-semibold hover:bg-amber-200 transition inline-flex items-center gap-1"
+                        >
+                          <span>🔗 View Email</span>
+                        </a>
+                      )}
                       <button
                         type="button"
                         onClick={() => setSelectedLog(log)}
@@ -387,6 +564,22 @@ export default function ManageSubscribers() {
               </button>
             </div>
 
+            {selectedLog.previewUrl && (
+              <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 flex items-center justify-between">
+                <span className="text-xs text-amber-900 font-medium">
+                  Test mailbox preview is available for this broadcast:
+                </span>
+                <a
+                  href={selectedLog.previewUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-lg bg-amber-700 px-3 py-1 text-xs font-bold text-white hover:bg-amber-800 transition"
+                >
+                  Open Preview Link ↗
+                </a>
+              </div>
+            )}
+
             <div>
               <p className="text-xs font-mono uppercase text-ink/50 mb-1">Message Content:</p>
               <div className="rounded-xl bg-[#fbf9f4] p-3 text-xs text-ink/80 leading-relaxed max-h-36 overflow-y-auto whitespace-pre-line border border-line">
@@ -396,7 +589,8 @@ export default function ManageSubscribers() {
 
             {selectedLog.link && (
               <p className="text-xs text-ink/60">
-                <strong>Target Link:</strong> <span className="font-mono text-forest">{selectedLog.link}</span>
+                <strong>Target Link:</strong>{' '}
+                <span className="font-mono text-forest">{selectedLog.link}</span>
               </p>
             )}
 
@@ -418,7 +612,10 @@ export default function ManageSubscribers() {
               <div className="max-h-44 overflow-y-auto rounded-xl border border-line bg-white p-2.5 space-y-1">
                 {selectedLog.recipientEmails && selectedLog.recipientEmails.length > 0 ? (
                   selectedLog.recipientEmails.map((email, idx) => (
-                    <div key={idx} className="flex items-center justify-between rounded px-2 py-1 text-xs font-mono hover:bg-[#fbf9f4]">
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between rounded px-2 py-1 text-xs font-mono hover:bg-[#fbf9f4]"
+                    >
                       <span className="text-ink font-medium">{email}</span>
                       <span className="text-[10px] text-emerald-600">✓ Sent</span>
                     </div>
@@ -446,13 +643,13 @@ export default function ManageSubscribers() {
 
       {/* Modal: Compose Broadcast & Send Test Email */}
       {showBroadcastModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm overflow-y-auto">
+          <div className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl my-8">
             <div className="flex items-center justify-between border-b border-line pb-4">
               <div>
-                <h3 className="font-display text-xl font-bold text-ink">Broadcast to All Subscribers</h3>
+                <h3 className="font-display text-xl font-bold text-ink">Broadcast Announcement</h3>
                 <p className="text-xs text-ink/60 mt-0.5">
-                  Sends an announcement email to all {activeCount} active subscriber(s).
+                  Sends an email announcement to all <strong>{activeCount} active subscriber(s)</strong> with luxury NMC branding.
                 </p>
               </div>
               <button
@@ -464,7 +661,37 @@ export default function ManageSubscribers() {
               </button>
             </div>
 
-            <form onSubmit={handleSendBroadcast} className="mt-5 space-y-4">
+            {/* Quick Templates */}
+            <div className="mt-4 pt-1">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-ink/50 block mb-1.5">
+                Quick Template Presets:
+              </span>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => applyTemplate('harvest')}
+                  className="rounded-lg border border-line bg-[#fbf9f4] px-2.5 py-1 text-xs text-ink hover:border-forest hover:bg-white transition"
+                >
+                  🌾 New Harvest Alert
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyTemplate('freight')}
+                  className="rounded-lg border border-line bg-[#fbf9f4] px-2.5 py-1 text-xs text-ink hover:border-forest hover:bg-white transition"
+                >
+                  🚢 Ocean Freight Booking
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyTemplate('catalog')}
+                  className="rounded-lg border border-line bg-[#fbf9f4] px-2.5 py-1 text-xs text-ink hover:border-forest hover:bg-white transition"
+                >
+                  📦 2026 Export Catalog
+                </button>
+              </div>
+            </div>
+
+            <form onSubmit={handleSendBroadcast} className="mt-4 space-y-4">
               <div>
                 <label className="block text-xs font-mono uppercase tracking-wider text-ink/70 mb-1">
                   Email Subject *
@@ -474,7 +701,9 @@ export default function ManageSubscribers() {
                   required
                   placeholder="e.g. Special Harvest Offer: Premium Gujarat Cumin & Fennel Available"
                   value={broadcastForm.subject}
-                  onChange={(e) => setBroadcastForm({ ...broadcastForm, subject: e.target.value })}
+                  onChange={(e) =>
+                    setBroadcastForm({ ...broadcastForm, subject: e.target.value })
+                  }
                   className="w-full rounded-xl border border-line bg-[#fbf9f4] px-4 py-2.5 text-sm text-ink outline-none focus:border-forest focus:bg-white"
                 />
               </div>
@@ -487,7 +716,9 @@ export default function ManageSubscribers() {
                   rows={4}
                   placeholder="Share details about new crop season, container bookings, lab clearance or price indications…"
                   value={broadcastForm.message}
-                  onChange={(e) => setBroadcastForm({ ...broadcastForm, message: e.target.value })}
+                  onChange={(e) =>
+                    setBroadcastForm({ ...broadcastForm, message: e.target.value })
+                  }
                   className="w-full rounded-xl border border-line bg-[#fbf9f4] px-4 py-2.5 text-sm text-ink outline-none focus:border-forest focus:bg-white"
                 />
               </div>
@@ -498,20 +729,36 @@ export default function ManageSubscribers() {
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. /products or /blog/cumin-market-report"
+                  placeholder="e.g. /products or /inquiry"
                   value={broadcastForm.link}
-                  onChange={(e) => setBroadcastForm({ ...broadcastForm, link: e.target.value })}
+                  onChange={(e) =>
+                    setBroadcastForm({ ...broadcastForm, link: e.target.value })
+                  }
                   className="w-full rounded-xl border border-line bg-[#fbf9f4] px-4 py-2.5 text-sm text-ink outline-none focus:border-forest focus:bg-white"
                 />
               </div>
 
-              {/* Test Email Option to verify user's inbox */}
-              <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-3 text-xs space-y-2">
-                <span className="font-bold text-amber-900 block">🧪 Test Email Before Sending:</span>
+              {/* Test Email Option */}
+              <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-3.5 text-xs space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-amber-900 block">
+                    🧪 Send Test Email First (Verify Delivery):
+                  </span>
+                  {smtpStatus?.isConfigured ? (
+                    <span className="text-[10px] font-mono text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">
+                      Live SMTP
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-mono text-amber-800 bg-amber-200 px-1.5 py-0.5 rounded">
+                      Test Preview Mode
+                    </span>
+                  )}
+                </div>
+
                 <div className="flex gap-2">
                   <input
                     type="email"
-                    placeholder="Enter your personal email to test…"
+                    placeholder="Enter your email to test (e.g. yourname@gmail.com)…"
                     value={testEmailTarget}
                     onChange={(e) => setTestEmailTarget(e.target.value)}
                     className="flex-1 rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-xs text-ink outline-none"
@@ -520,12 +767,57 @@ export default function ManageSubscribers() {
                     type="button"
                     onClick={handleSendTestEmail}
                     disabled={sendingTest || !testEmailTarget}
-                    className="rounded-lg bg-amber-700 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-800 disabled:opacity-50 whitespace-nowrap"
+                    className="rounded-lg bg-amber-700 px-4 py-1.5 text-xs font-bold text-white hover:bg-amber-800 disabled:opacity-50 whitespace-nowrap shadow-sm transition"
                   >
                     {sendingTest ? 'Sending…' : 'Send Test'}
                   </button>
                 </div>
+
+                {testResult && (
+                  <div className="rounded-lg bg-white p-2.5 border border-amber-200 text-xs space-y-1.5">
+                    <p className="font-semibold text-emerald-800">
+                      ✓ {testResult.message}
+                    </p>
+                    {testResult.previewUrl && (
+                      <div className="flex items-center justify-between pt-1">
+                        <span className="text-[11px] text-ink/60">Ethereal preview link ready:</span>
+                        <a
+                          href={testResult.previewUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="rounded bg-amber-700 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-amber-800 transition"
+                        >
+                          Open Rendered Email Preview ↗
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
+
+              {/* Broadcast Result Feedback */}
+              {broadcastResult && (
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-xs space-y-2">
+                  <p className="font-bold text-emerald-900 text-sm">
+                    ✓ {broadcastResult.message}
+                  </p>
+                  <p className="text-emerald-800">
+                    Dispatched to {broadcastResult.successfulCount} / {broadcastResult.recipientCount} subscriber(s).
+                  </p>
+                  {broadcastResult.previewUrl && (
+                    <div className="pt-1">
+                      <a
+                        href={broadcastResult.previewUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 rounded-lg bg-forest px-3 py-1.5 text-xs font-bold text-white hover:bg-forest/90 transition shadow-sm"
+                      >
+                        <span>🔗 View Broadcast Email in Test Mailbox ↗</span>
+                      </a>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-line">
                 <button
@@ -533,14 +825,16 @@ export default function ManageSubscribers() {
                   onClick={() => setShowBroadcastModal(false)}
                   className="rounded-xl border border-line px-4 py-2 text-xs font-medium text-ink hover:bg-line/20"
                 >
-                  Cancel
+                  Close
                 </button>
                 <button
                   type="submit"
-                  disabled={sendingBroadcast}
-                  className="rounded-xl bg-forest px-5 py-2 text-xs font-bold text-white shadow-md hover:bg-forest/90 disabled:opacity-50 inline-flex items-center gap-2"
+                  disabled={sendingBroadcast || activeCount === 0}
+                  className="rounded-xl bg-forest px-5 py-2.5 text-xs font-bold text-white shadow-md hover:bg-forest/90 disabled:opacity-50 inline-flex items-center gap-2"
                 >
-                  {sendingBroadcast ? 'Dispatching…' : `Dispatch to All ${activeCount} Subscribers`}
+                  {sendingBroadcast
+                    ? 'Dispatching Announcement…'
+                    : `Dispatch to All ${activeCount} Active Subscribers`}
                 </button>
               </div>
             </form>

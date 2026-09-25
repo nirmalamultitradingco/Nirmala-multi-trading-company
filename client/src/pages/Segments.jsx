@@ -74,10 +74,15 @@ export default function Segments() {
     ? productsData.products
     : featuredProducts;
 
-  const showcaseTitle = activeSegmentObj ? activeSegmentObj.name : 'Farali & Agro Commodities';
+  const showcaseTitle = activeSegmentObj
+    ? activeSegmentObj.name
+    : t('allExportFoodProducts') || 'All Export Food Products';
+
   const showcaseSubtitle = activeSegmentObj?.description
     ? activeSegmentObj.description
-    : 'A delightful crunch inspired by tradition, crafted with bold flavors for global export markets.';
+    : '100% Sortex-cleaned Indian spices, premium grains, pulses, and value-added food products ready for containerized ocean shipping.';
+
+  const showcaseWatermark = activeSegmentObj ? activeSegmentObj.name : 'FOOD PRODUCTS';
 
   return (
     <div className="container-x py-10 md:py-16 space-y-12">
@@ -97,6 +102,7 @@ export default function Segments() {
       <ProductShowcaseArc
         title={showcaseTitle}
         subtitle={showcaseSubtitle}
+        watermark={showcaseWatermark}
         products={showcaseProducts}
       />
 
@@ -106,14 +112,14 @@ export default function Segments() {
           <div>
             <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-gold">Export Segment</span>
             <h2 className="mt-0.5 font-display text-2xl sm:text-3xl font-bold text-ink">
-              {activeSegmentObj ? activeSegmentObj.name : t('allProducts') || 'All Export Commodities'}
+              {activeSegmentObj ? activeSegmentObj.name : t('allProducts') || 'All Export Food Products'}
             </h2>
             <p className="text-xs sm:text-sm text-ink/65 mt-0.5 max-w-2xl">
-              {activeSegmentObj?.description || 'Browse our certified Sortex-cleaned export food commodities and farm cluster supplies.'}
+              {activeSegmentObj?.description || 'Browse our certified Sortex-cleaned export food products and farm cluster supplies.'}
             </p>
           </div>
           <span className="shrink-0 font-mono text-xs font-semibold text-moss bg-forest/5 px-3 py-1.5 rounded-full border border-forest/15">
-            {productsData.total || productsData.products.length} Products Available
+            {productsData.total || productsData.products.length} Food Products Available
           </span>
         </div>
 
@@ -135,8 +141,8 @@ export default function Segments() {
 
           {/* Bento Feature Banner */}
           <BentoHighlightCard
-            title={activeSegmentObj ? `${activeSegmentObj.name} Feast, Perfected` : 'Farali Feast, Perfected'}
-            subtitle="Light, crispy savories crafted for festive occasions and everyday nourishment with pure ingredients."
+            title={activeSegmentObj ? `${activeSegmentObj.name} Selection, Perfected` : 'Global Food Products, Perfected'}
+            subtitle={activeSegmentObj?.description || "Direct sourcing of export-grade Indian spices, premium grains, and food products with certified global shipping."}
             bullet="Direct Mundra Port Shipments · APEDA & FSSAI Cleared · Customized Retails Pouches"
           />
 
