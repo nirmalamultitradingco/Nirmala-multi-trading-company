@@ -216,6 +216,8 @@ export default function ManageProducts() {
   const [form, setForm] = useState(blank);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [bannerSuccess, setBannerSuccess] = useState('');
+  const [bannerError, setBannerError] = useState('');
 
   const load = () =>
     api
@@ -313,14 +315,20 @@ export default function ManageProducts() {
     try {
       if (editing) {
         await api.put(`/products/${editing._id}`, payload);
+        setBannerSuccess('✓ Product updated successfully in MongoDB!');
       } else {
         await api.post('/products', payload);
+        setBannerSuccess('✓ Product added successfully to MongoDB!');
       }
 
       setOpen(false);
+      setTimeout(() => setBannerSuccess(''), 6000);
       load();
     } catch (err) {
-      setError(err.message);
+      const msg = err.response?.data?.message || err.message || 'Failed to save product in MongoDB.';
+      setError(msg);
+      setBannerError('✗ Error: ' + msg);
+      setTimeout(() => setBannerError(''), 8000);
     } finally {
       setBusy(false);
     }
@@ -331,9 +339,13 @@ export default function ManageProducts() {
 
     try {
       await api.delete(`/products/${p._id}`);
+      setBannerSuccess('✓ Product deleted successfully from MongoDB!');
+      setTimeout(() => setBannerSuccess(''), 6000);
       load();
     } catch (err) {
-      alert(err.message);
+      const msg = err.response?.data?.message || err.message || 'Failed to delete product.';
+      setBannerError('✗ Error: ' + msg);
+      setTimeout(() => setBannerError(''), 8000);
     }
   };
 
@@ -355,6 +367,32 @@ export default function ManageProducts() {
           + New product detail
         </button>
       </div>
+
+      {bannerSuccess && (
+        <div className="mt-4 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800 shadow-sm flex items-center justify-between">
+          <span>{bannerSuccess}</span>
+          <button
+            type="button"
+            onClick={() => setBannerSuccess('')}
+            className="text-emerald-700 hover:text-emerald-950 font-bold ml-4"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {bannerError && (
+        <div className="mt-4 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800 shadow-sm flex items-center justify-between">
+          <span>{bannerError}</span>
+          <button
+            type="button"
+            onClick={() => setBannerError('')}
+            className="text-red-700 hover:text-red-950 font-bold ml-4"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* PRODUCT TABLE */}
       <div className="mt-6 overflow-x-auto rounded-xl border border-line bg-white shadow-card">

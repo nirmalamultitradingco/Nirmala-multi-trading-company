@@ -174,10 +174,13 @@ export default function ManageNews() {
     }
   };
 
+  const [bannerError, setBannerError] = useState('');
+
   const save = async (e) => {
     e.preventDefault();
     setBusy(true);
     setError('');
+    setBannerError('');
     try {
       const payload = {
         ...form,
@@ -188,17 +191,22 @@ export default function ManageNews() {
         images: (form.images || []).filter(Boolean),
       };
 
-      if (editing) await api.put(`/news/${editing._id}`, payload);
-      else await api.post('/news', payload);
+      if (editing) {
+        await api.put(`/news/${editing._id}`, payload);
+        setBannerSuccess('✓ Data updated successfully in MongoDB!');
+      } else {
+        await api.post('/news', payload);
+        setBannerSuccess('✓ Data added successfully to MongoDB!');
+      }
 
       setOpen(false);
-      if (form.notifySubscribers) {
-        setBannerSuccess('Blog post saved and email notification dispatched to subscribers!');
-        setTimeout(() => setBannerSuccess(''), 6000);
-      }
+      setTimeout(() => setBannerSuccess(''), 6000);
       await load();
     } catch (err) {
-      setError(err.message);
+      const msg = err.response?.data?.message || err.message || 'Failed to save data in MongoDB.';
+      setError(msg);
+      setBannerError('✗ Error: ' + msg);
+      setTimeout(() => setBannerError(''), 8000);
     } finally {
       setBusy(false);
     }
@@ -208,9 +216,13 @@ export default function ManageNews() {
     if (!confirm(`Delete blog post "${item.title || 'Untitled'}"?`)) return;
     try {
       await api.delete(`/news/${item._id}`);
+      setBannerSuccess('✓ Post deleted successfully from MongoDB!');
+      setTimeout(() => setBannerSuccess(''), 6000);
       await load();
     } catch (err) {
-      alert(err.message);
+      const msg = err.response?.data?.message || err.message || 'Failed to delete post.';
+      setBannerError('✗ Error: ' + msg);
+      setTimeout(() => setBannerError(''), 8000);
     }
   };
 
@@ -229,17 +241,31 @@ export default function ManageNews() {
       </div>
 
       {bannerSuccess && (
-        <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 shadow-sm flex items-center justify-between">
-          <span>✓ {bannerSuccess}</span>
+        <div className="mt-4 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800 shadow-sm flex items-center justify-between">
+          <span>{bannerSuccess}</span>
           <button
             type="button"
             onClick={() => setBannerSuccess('')}
-            className="text-emerald-600 hover:text-emerald-900 font-bold"
+            className="text-emerald-700 hover:text-emerald-950 font-bold ml-4"
           >
             ✕
           </button>
         </div>
       )}
+
+      {bannerError && (
+        <div className="mt-4 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800 shadow-sm flex items-center justify-between">
+          <span>{bannerError}</span>
+          <button
+            type="button"
+            onClick={() => setBannerError('')}
+            className="text-red-700 hover:text-red-950 font-bold ml-4"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
 
       <div className="mt-6 grid gap-4">
         {items.map((item) => (
