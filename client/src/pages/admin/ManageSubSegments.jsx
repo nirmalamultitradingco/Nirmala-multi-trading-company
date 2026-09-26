@@ -20,6 +20,8 @@ export default function ManageSubSegments() {
   const [form, setForm] = useState(blank);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [bannerSuccess, setBannerSuccess] = useState('');
+  const [bannerError, setBannerError] = useState('');
 
   const load = () =>
     api.get('/subsegments', { params: { all: true } }).then((r) => setItems(r.data));
@@ -51,14 +53,24 @@ export default function ManageSubSegments() {
     e.preventDefault();
     setBusy(true);
     setError('');
+    setBannerError('');
 
     try {
-      if (editing) await api.put(`/subsegments/${editing._id}`, form);
-      else await api.post('/subsegments', form);
+      if (editing) {
+        await api.put(`/subsegments/${editing._id}`, form);
+        setBannerSuccess('✓ Data is successfully updated in MongoDB!');
+      } else {
+        await api.post('/subsegments', form);
+        setBannerSuccess('✓ Data is successfully added in MongoDB!');
+      }
       setOpen(false);
+      setTimeout(() => setBannerSuccess(''), 6000);
       load();
     } catch (err) {
-      setError(err.message);
+      const msg = err.response?.data?.message || err.message || 'Failed to save data in MongoDB.';
+      setError(msg);
+      setBannerError('✗ Error: ' + msg);
+      setTimeout(() => setBannerError(''), 8000);
     } finally {
       setBusy(false);
     }
@@ -68,9 +80,13 @@ export default function ManageSubSegments() {
     if (!confirm(`Delete sub product "${item.name}"?`)) return;
     try {
       await api.delete(`/subsegments/${item._id}`);
+      setBannerSuccess('✓ Data is successfully deleted from MongoDB!');
+      setTimeout(() => setBannerSuccess(''), 6000);
       load();
     } catch (err) {
-      alert(err.message);
+      const msg = err.response?.data?.message || err.message || 'Failed to delete data from MongoDB.';
+      setBannerError('✗ Error: ' + msg);
+      setTimeout(() => setBannerError(''), 8000);
     }
   };
 
@@ -90,6 +106,32 @@ export default function ManageSubSegments() {
         </div>
         <button className="btn-primary shrink-0" onClick={openNew}>+ New sub product</button>
       </div>
+
+      {bannerSuccess && (
+        <div className="mt-4 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800 shadow-sm flex items-center justify-between">
+          <span>{bannerSuccess}</span>
+          <button
+            type="button"
+            onClick={() => setBannerSuccess('')}
+            className="text-emerald-700 hover:text-emerald-950 font-bold ml-4"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {bannerError && (
+        <div className="mt-4 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800 shadow-sm flex items-center justify-between">
+          <span>{bannerError}</span>
+          <button
+            type="button"
+            onClick={() => setBannerError('')}
+            className="text-red-700 hover:text-red-950 font-bold ml-4"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       <div className="mt-6 space-y-6">
         {grouped.map(({ segment, items: segmentItems }) => (

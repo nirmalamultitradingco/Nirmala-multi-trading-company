@@ -2914,9 +2914,12 @@ export default function ManageSiteContent() {
     try {
       const r = await api.put('/site-content', content);
       setContent(r.data);
-      setMessage('All website content changes saved successfully.');
+      setMessage('✓ Data is successfully updated in MongoDB!');
+      setTimeout(() => setMessage(''), 6000);
     } catch (e) {
-      setError(e.message);
+      const msg = e.response?.data?.message || e.message || 'Failed to save content in MongoDB.';
+      setError('✗ Error: ' + msg);
+      setTimeout(() => setError(''), 8000);
     } finally {
       setBusy(false);
     }

@@ -28,6 +28,8 @@ export default function Inquiries() {
   const [replySubject, setReplySubject] = useState('');
   const [replyBody, setReplyBody] = useState('');
   const [copiedDraft, setCopiedDraft] = useState(false);
+  const [bannerSuccess, setBannerSuccess] = useState('');
+  const [bannerError, setBannerError] = useState('');
 
   const load = () => {
     const params = {};
@@ -53,14 +55,28 @@ export default function Inquiries() {
   };
 
   const setStatus = async (id, status) => {
-    await api.patch(`/inquiries/${id}`, { status });
-    load();
+    try {
+      await api.patch(`/inquiries/${id}`, { status });
+      setBannerSuccess(`✓ Inquiry status updated to "${status}" in MongoDB!`);
+      setTimeout(() => setBannerSuccess(''), 6000);
+      load();
+    } catch (err) {
+      setBannerError('✗ Error: ' + (err.response?.data?.message || err.message));
+      setTimeout(() => setBannerError(''), 8000);
+    }
   };
 
   const remove = async (i) => {
     if (!confirm(`Delete inquiry from ${i.name}?`)) return;
-    await api.delete(`/inquiries/${i._id}`);
-    load();
+    try {
+      await api.delete(`/inquiries/${i._id}`);
+      setBannerSuccess('✓ Inquiry deleted successfully from MongoDB!');
+      setTimeout(() => setBannerSuccess(''), 6000);
+      load();
+    } catch (err) {
+      setBannerError('✗ Error: ' + (err.response?.data?.message || err.message));
+      setTimeout(() => setBannerError(''), 8000);
+    }
   };
 
   const handleOpenReply = (inquiry) => {
@@ -193,6 +209,32 @@ Website: https://nirmalamultitrading.com`;
           </div>
         </div>
       </div>
+
+      {bannerSuccess && (
+        <div className="rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800 shadow-sm flex items-center justify-between">
+          <span>{bannerSuccess}</span>
+          <button
+            type="button"
+            onClick={() => setBannerSuccess('')}
+            className="text-emerald-700 hover:text-emerald-950 font-bold ml-4"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {bannerError && (
+        <div className="rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800 shadow-sm flex items-center justify-between">
+          <span>{bannerError}</span>
+          <button
+            type="button"
+            onClick={() => setBannerError('')}
+            className="text-red-700 hover:text-red-950 font-bold ml-4"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Filter and Search Bar */}
       <div className="rounded-2xl border border-line bg-white p-4 shadow-card">
